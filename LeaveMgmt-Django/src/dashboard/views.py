@@ -34,36 +34,33 @@ def dashboard(request):
 
     employees = Employee.objects.all()
     leaves = Leave.objects.all_pending_leaves()
-    allLeaveObj = Leave.objects.all()
+    # allLeaveObj = Leave.objects.all()
     staff_leaves = Leave.objects.filter(user=user)
-    updateDate = allLeaveObj.model.date_of_approved_leave
+
+    pendingLeaveForCurrUser = []
+    for leave in leaves:
+        if leave in staff_leaves:
+            pendingLeaveForCurrUser.append(leave)
+    print(pendingLeaveForCurrUser)
+
+    # updateDate = allLeaveObj.model.date_of_approved_leave
     # .get calls safe guarded for admin query
     try:
-        l = Leave.objects.filter(created=allLeaveObj.model.date_of_approved_leave)
-        print("\n\ndashboard/views", l[0].status)
-        l = l[0]
-    # try:
+        # l = Leave.objects.filter(created=allLeaveObj.model.date_of_approved_leave)
+        # print("\n\ndashboard/views", l[0].status)
+        # l = l[0]
         e = Employee.objects.get(user=user)
 
-        # for i in range(len(l)):
-        #     l_T = l[i]
-        #     if l_T.is_approved == False:
-        #         print("in if", l_T)
-        #         l = l_T
-        #         break
+        o1 = pendingLeaveForCurrUser[0].leave_days
+        o2 = Leave.Tempdays
+        o3 = pendingLeaveForCurrUser[0].status
 
-        # leave status change detect
-        # print("dashboard/views", l.status)
-        print("\n\ndashboard/views", l.status)
-
-        if status != l.status and l.status != "pending":
-            status = l.status
-            print("dashboard/views", status)
-            if l.leavetype == 'Unpaid':
-                e.Unpaid = e.Unpaid - l.Tempdays
+        if pendingLeaveForCurrUser[0].leave_days == Leave.Tempdays and pendingLeaveForCurrUser[0].status == "approved":
+            if pendingLeaveForCurrUser[0].leavetype == 'Unpaid':
+                e.Unpaid = e.Unpaid - pendingLeaveForCurrUser[0].leave_days
                 e.save()
             else:
-                e.Paid = e.Paid - l.Tempdays
+                e.Paid = e.Paid - pendingLeaveForCurrUser[0].leave_days
                 e.save()
         print("dashboard/views", e.Paid, e.Unpaid)
         dataset['remLeavePaid'] = e.Paid
@@ -293,8 +290,10 @@ def leaves_view(request, id):
 
     leave = get_object_or_404(Leave, id=id)
     print(leave.user)
-    employee = Employee.objects.filter(user=leave.user)[0]
+
+    employee = Employee.objects.filter(user=leave.user)
     print(employee)
+
     return render(request, 'dashboard/leave_detail_view.html', {'leave': leave, 'employee': employee,
                                                                 'title': '{0}-{1} leave'.format(leave.user.username,
                                                                                                 leave.status)})

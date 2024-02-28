@@ -90,8 +90,8 @@ class Employee(models.Model):
     # PERSONAL DATA
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
-    image = models.FileField(_('Profile Image'), upload_to='profiles', default='default.png', blank=True, null=True,
-                             help_text='upload image size less than 2.0MB')  # work on path username-date/image
+    # image = models.FileField(_('Profile Image'), upload_to='profiles', default='default.png', blank=True, null=True,
+    #                          help_text='upload image size less than 2.0MB')  # work on path username-date/image
     firstname = models.CharField(_('Firstname'), max_length=125, null=False, blank=False)
     lastname = models.CharField(_('Lastname'), max_length=125, null=False, blank=False)
     othername = models.CharField(_('Othername (optional)'), max_length=125, null=True, blank=True)

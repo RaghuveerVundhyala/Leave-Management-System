@@ -72,7 +72,7 @@ class Leave(models.Model):
         leave = self.leavetype
         user = self.user
         employee = user.employee_set.first().get_full_name
-        return ('{0} - {1}'.format(employee, leave))
+        return '{0} - {1}'.format(employee, leave)
 
     def businessDays(self, startdate, enddate):
         from datetime import datetime, timedelta
@@ -82,24 +82,21 @@ class Leave(models.Model):
 
         # generating dates
         dates = (test_date1 + timedelta(idx + 1)
-                for idx in range((test_date2 - test_date1).days))
+                 for idx in range((test_date2 - test_date1).days))
 
         # summing all weekdays
         res = sum(1 for day in dates if day.weekday() < 5)
 
-
         # holidayList = [datetime(2015, 6, 3)]
-        if startdate.month == 12: #dec month
-            if startdate.day <= 25 or enddate.day >= 25:    # christmas
-                res = res-1
+        if startdate.month == 12:  # dec month
+            if startdate.day <= 25 or enddate.day >= 25:  # christmas
+                res = res - 1
 
-        if startdate.month == 1: #Jan month
-            if startdate.day <= 1 or enddate.day >= 1:      # new year
-                res = res-1
+        if startdate.month == 1:  # Jan month
+            if startdate.day <= 1 or enddate.day >= 1:  # new year
+                res = res - 1
 
         return res
-
-
 
     @property
     def leave_days(self):
@@ -119,7 +116,6 @@ class Leave(models.Model):
         Leave.Tempdays = busineesDay
         Leave.date_of_approved_leave = self.created
         return busineesDay
-
 
     @property
     def leave_approved(self):
@@ -153,12 +149,10 @@ class Leave(models.Model):
             self.status = 'cancelled'
             self.save()
 
-
     def reject_leave(self, eObj):
         subject = 'Leave Rejected'
         message = f'Hi {eObj.firstname}, Your leave got rejected.'
         email_from = settings.EMAIL_HOST_USER
-        # recipient_list = ["@gmail.com"]
         recipient_list = [eObj.email]
         send_mail(subject, message, email_from, recipient_list)
         if self.is_approved or not self.is_approved:

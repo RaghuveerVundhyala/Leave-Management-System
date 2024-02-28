@@ -1,3 +1,4 @@
+from DSEmp.employee_details import Employee
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
