@@ -106,31 +106,34 @@
             </div>
 
             <ul class="nav">
-                <li class="active">
-                    <a href="{% url 'dashboard:dashboard' %}">
-                        <i class="pe-7s-graph"></i>
-                        <p>Dashboard</p>
-                    </a>
-                </li>
+    <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <a href="{% url 'dashboard:dashboard' %}">
+            <i class="pe-7s-graph"></i>
+            <p>Dashboard</p>
+        </a>
+    </li>
 
-                
-                {% if request.user.is_superuser and request.user.is_staff %}
-                <li>
-                    <a href="{% url 'dashboard:employees' %}">
-                        <i class="pe-7s-users"></i>
-                        <p>Employee Section</p>
-                    </a>
-                </li>
-                {% endif %}
+    {% if request.user.is_superuser and request.user.is_staff %}
+    <li class="{% if request.resolver_match.url_name == 'employees' %}active{% endif %}">
+        <a href="{% url 'dashboard:employees' %}">
+            <i class="pe-7s-users"></i>
+            <p>Employee Section</p>
+        </a>
+    </li>
+    {% endif %}
 
-                <li>
-                    {% if request.user.is_superuser %}<a href="{% url 'dashboard:leaveslist' %}">{% else %}<a href="{% url 'dashboard:staffleavetable' %}"> {% endif %}
-                        <i class="pe-7s-news-paper"></i>
-                        <p>Leave Section</p>
-                    </a>
-                </li>
-                
-            </ul>
+    <li class="{% if request.resolver_match.url_name == 'leaveslist' or request.resolver_match.url_name == 'staffleavetable' %}active{% endif %}">
+        {% if request.user.is_superuser %}
+        <a href="{% url 'dashboard:leaveslist' %}">
+        {% else %}
+        <a href="{% url 'dashboard:staffleavetable' %}">
+        {% endif %}
+            <i class="pe-7s-news-paper"></i>
+            <p>Leave Section</p>
+        </a>
+    </li>
+</ul>
+
     	</div>
 
     </div>
