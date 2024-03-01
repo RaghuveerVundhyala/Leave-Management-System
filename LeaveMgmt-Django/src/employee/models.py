@@ -114,7 +114,7 @@ class Employee(models.Model):
                                        blank=True)
 
     email = models.CharField(_('Email'), max_length=50, null=False, blank=False)
-    email_pass = models.CharField(_('Email Password'), max_length=50, null=False, blank=False)
+    #email_pass = models.CharField(_('Email Password'), max_length=50, null=False, blank=False)
 
 
     # app related

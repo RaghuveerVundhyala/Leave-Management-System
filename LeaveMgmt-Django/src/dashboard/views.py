@@ -11,9 +11,26 @@ from leave.models import Leave
 from employee.models import *
 from leave.forms import LeaveCreationForm
 from django.core.mail import send_mail
+from datetime import datetime
 
 status = 0
 date = 0
+
+from datetime import datetime
+
+def compare_dates(date1, date2):
+    # convert string to date
+    flag = False
+    if date1.date() > date2.date():
+        flag = True
+    if date1.time()> date2.time():
+        flag = True
+    else:
+        flag = False
+
+    return flag
+
+
 
 
 def dashboard(request):
@@ -37,11 +54,19 @@ def dashboard(request):
     # allLeaveObj = Leave.objects.all()
     staff_leaves = Leave.objects.filter(user=user)
 
-    pendingLeaveForCurrUser = []
-    for leave in leaves:
-        if leave in staff_leaves:
-            pendingLeaveForCurrUser.append(leave)
-    print(pendingLeaveForCurrUser)
+    dateupdated = datetime(2000, 1, 1, 0, 0, 0)
+    currLeaveObj = None
+    for leave in staff_leaves:
+        if compare_dates(leave.updated, dateupdated):
+            dateupdated = leave.updated
+            currLeaveObj = leave
+
+
+    # pendingLeaveForCurrUser = []
+    # for leave in leaves:
+    #     if leave in staff_leaves:
+    #         pendingLeaveForCurrUser.append(leave)
+    # print(pendingLeaveForCurrUser)
 
     # updateDate = allLeaveObj.model.date_of_approved_leave
     # .get calls safe guarded for admin query
@@ -51,17 +76,24 @@ def dashboard(request):
         # l = l[0]
         e = Employee.objects.get(user=user)
 
-        o1 = pendingLeaveForCurrUser[0].leave_days
-        o2 = Leave.Tempdays
-        o3 = pendingLeaveForCurrUser[0].status
-
-        if pendingLeaveForCurrUser[0].leave_days == Leave.Tempdays and pendingLeaveForCurrUser[0].status == "approved":
-            if pendingLeaveForCurrUser[0].leavetype == 'Unpaid':
-                e.Unpaid = e.Unpaid - pendingLeaveForCurrUser[0].leave_days
+        # o1 = pendingLeaveForCurrUser[0].leave_days
+        # o2 = Leave.Tempdays
+        # o3 = pendingLeaveForCurrUser[0].status
+        # if currLeaveObj == 0:
+        #     e.Unpaid = e.Unpaid
+        #     e.Paid = e.Paid
+        #     e.save()
+        if currLeaveObj.status == "approved":
+            if currLeaveObj.leavetype == 'Unpaid':
+                e.Unpaid = e.Unpaid - currLeaveObj.leave_days
                 e.save()
             else:
-                e.Paid = e.Paid - pendingLeaveForCurrUser[0].leave_days
+                e.Paid = e.Paid - currLeaveObj.leave_days
                 e.save()
+        else:
+            e.Paid = e.Paid
+            e.Unpaid = e.Unpaid
+            e.save()
         print("dashboard/views", e.Paid, e.Unpaid)
         dataset['remLeavePaid'] = e.Paid
         dataset['remLeaveUnpaid'] = e.Unpaid
@@ -292,9 +324,10 @@ def leaves_view(request, id):
     print(leave.user)
 
     employee = Employee.objects.filter(user=leave.user)
+    # o1 = employee.models.fullname
     print(employee)
 
-    return render(request, 'dashboard/leave_detail_view.html', {'leave': leave, 'employee': employee,
+    return render(request, 'dashboard/leave_detail_view.html', {'leave': leave, 'employee': employee, 'name':leave.user.username,
                                                                 'title': '{0}-{1} leave'.format(leave.user.username,
                                                                                                 leave.status)})
 
