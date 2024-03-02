@@ -139,7 +139,7 @@ class Leave(models.Model):
     def unapprove_leave(self):
         if self.is_approved:
             self.is_approved = False
-            self.status = 'pending'
+            self.status = 'cancelled'
             self.save()
 
     @property

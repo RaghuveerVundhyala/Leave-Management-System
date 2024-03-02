@@ -15,18 +15,20 @@ from datetime import datetime
 
 status = 0
 date = 0
-
+pastLeaveObj = None
 from datetime import datetime
+
 
 def compare_dates(date1, date2):
     # convert string to date
     flag = False
     if date1.date() > date2.date():
         flag = True
-    if date1.time()> date2.time():
-        flag = True
-    else:
-        flag = False
+    elif date1.date() == date2.date():
+        if date1.time()> date2.time():
+            flag = True
+        else:
+            flag = False
 
     return flag
 
@@ -43,6 +45,7 @@ def dashboard(request):
 
     global status
     global date
+    global pastLeaveObj
     dataset = dict()
     user = request.user
 
@@ -51,7 +54,6 @@ def dashboard(request):
 
     employees = Employee.objects.all()
     leaves = Leave.objects.all_pending_leaves()
-    # allLeaveObj = Leave.objects.all()
     staff_leaves = Leave.objects.filter(user=user)
 
     dateupdated = datetime(2000, 1, 1, 0, 0, 0)
@@ -62,44 +64,33 @@ def dashboard(request):
             currLeaveObj = leave
 
 
-    # pendingLeaveForCurrUser = []
-    # for leave in leaves:
-    #     if leave in staff_leaves:
-    #         pendingLeaveForCurrUser.append(leave)
-    # print(pendingLeaveForCurrUser)
-
-    # updateDate = allLeaveObj.model.date_of_approved_leave
-    # .get calls safe guarded for admin query
     try:
-        # l = Leave.objects.filter(created=allLeaveObj.model.date_of_approved_leave)
-        # print("\n\ndashboard/views", l[0].status)
-        # l = l[0]
         e = Employee.objects.get(user=user)
-
-        # o1 = pendingLeaveForCurrUser[0].leave_days
-        # o2 = Leave.Tempdays
-        # o3 = pendingLeaveForCurrUser[0].status
-        # if currLeaveObj == 0:
-        #     e.Unpaid = e.Unpaid
-        #     e.Paid = e.Paid
-        #     e.save()
-        if currLeaveObj.status == "approved":
-            if currLeaveObj.leavetype == 'Unpaid':
-                e.Unpaid = e.Unpaid - currLeaveObj.leave_days
-                e.save()
+        if currLeaveObj != pastLeaveObj:
+            pastLeaveObj = currLeaveObj
+            if currLeaveObj.status == "approved":
+                if currLeaveObj.leavetype == 'Unpaid':
+                    e.Unpaid = e.Unpaid - currLeaveObj.leave_days
+                    e.save()
+                else:
+                    e.Paid = e.Paid - currLeaveObj.leave_days
+                    e.save()
+            elif currLeaveObj.status == "cancelled" or currLeaveObj.status == "rejected":
+                if currLeaveObj.leavetype == 'Unpaid':
+                    e.Unpaid = e.Unpaid + currLeaveObj.leave_days
+                    e.save()
+                else:
+                    e.Paid = e.Paid + currLeaveObj.leave_days
+                    e.save()
             else:
-                e.Paid = e.Paid - currLeaveObj.leave_days
+                e.Paid = e.Paid
+                e.Unpaid = e.Unpaid
                 e.save()
-        else:
-            e.Paid = e.Paid
-            e.Unpaid = e.Unpaid
-            e.save()
         print("dashboard/views", e.Paid, e.Unpaid)
         dataset['remLeavePaid'] = e.Paid
         dataset['remLeaveUnpaid'] = e.Unpaid
     except:
         pass
-
     dataset['employees'] = employees
 
     dataset['leaves'] = leaves
