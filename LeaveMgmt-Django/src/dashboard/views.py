@@ -18,20 +18,19 @@ date = 0
 pastLeaveObj = None
 pastStatus = None
 
+
 def compare_dates(date1, date2):
     # convert string to date
     flag = False
     if date1.date() > date2.date():
         flag = True
     elif date1.date() == date2.date():
-        if date1.time()> date2.time():
+        if date1.time() > date2.time():
             flag = True
         else:
             flag = False
 
     return flag
-
-
 
 
 def dashboard(request):
@@ -62,7 +61,6 @@ def dashboard(request):
         if compare_dates(leave.updated, dateupdated):
             dateupdated = leave.updated
             currLeaveObj = leave
-
 
     try:
         e = Employee.objects.get(user=user)
@@ -260,7 +258,9 @@ def dashboard_employee_info(request, id):
 
 
 # ---------------------LEAVE-------------------------------------------
-
+def compDays(startDate, endDate):
+    #INCOMPLETE
+    return 10
 
 def leave_creation(request):
     if not request.user.is_authenticated:
@@ -268,7 +268,23 @@ def leave_creation(request):
     if request.method == 'POST':
         form = LeaveCreationForm(data=request.POST)
 
-        if form.is_valid():
+        # leave applied for days
+        # and leave type  -- done
+        # query employee for leave balance. --
+        valid = True
+        leaveType = form.data
+        leaveAppliedDays = compDays(leaveType["startdate"], leaveType["enddate"])
+        eObj = Employee.objects.filter(user=request.user)
+        leaveType = leaveType["leavetype"]
+        if leaveType == "Unpaid":
+            if eObj.Unpaid < leaveAppliedDays:
+                valid =False
+        else:
+            if eObj.Paid < leaveAppliedDays:
+                valid =False
+
+
+        if form.is_valid() and valid:
             instance = form.save(commit=False)
             user = request.user
             instance.user = user
@@ -320,9 +336,10 @@ def leaves_view(request, id):
     # o1 = employee.models.fullname
     print(employee)
 
-    return render(request, 'dashboard/leave_detail_view.html', {'leave': leave, 'employee': employee, 'name':leave.user.username,
-                                                                'title': '{0}-{1} leave'.format(leave.user.username,
-                                                                                                leave.status)})
+    return render(request, 'dashboard/leave_detail_view.html',
+                  {'leave': leave, 'employee': employee, 'name': leave.user.username,
+                   'title': '{0}-{1} leave'.format(leave.user.username,
+                                                   leave.status)})
 
 
 def approve_leave(request, id):
