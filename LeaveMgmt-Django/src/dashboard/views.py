@@ -16,8 +16,7 @@ from datetime import datetime
 status = 0
 date = 0
 pastLeaveObj = None
-from datetime import datetime
-
+pastStatus = None
 
 def compare_dates(date1, date2):
     # convert string to date
@@ -46,6 +45,7 @@ def dashboard(request):
     global status
     global date
     global pastLeaveObj
+    global pastStatus
     dataset = dict()
     user = request.user
 
@@ -66,8 +66,9 @@ def dashboard(request):
 
     try:
         e = Employee.objects.get(user=user)
-        if currLeaveObj != pastLeaveObj:
+        if currLeaveObj != pastLeaveObj or pastLeaveObj.status != pastStatus:
             pastLeaveObj = currLeaveObj
+            pastStatus = pastLeaveObj.status
             if currLeaveObj.status == "approved":
                 if currLeaveObj.leavetype == 'Unpaid':
                     e.Unpaid = e.Unpaid - currLeaveObj.leave_days
@@ -266,6 +267,7 @@ def leave_creation(request):
         return redirect('accounts:login')
     if request.method == 'POST':
         form = LeaveCreationForm(data=request.POST)
+
         if form.is_valid():
             instance = form.save(commit=False)
             user = request.user

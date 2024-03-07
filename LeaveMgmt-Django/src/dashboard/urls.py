@@ -12,19 +12,9 @@ urlpatterns = [
     path('employee/profile/<int:id>/', views.dashboard_employee_info, name='employeeinfo'),
     path('employee/profile/edit/<int:id>/', views.employee_edit_data, name='edit'),
 
-    # # Emergency
-    # path('emergency/create/',views.dashboard_emergency_create,name='emergencycreate'),
-    # path('emergency/update/<int:id>',views.dashboard_emergency_update,name='emergencyupdate'),
 
-    # # Family
-    # path('family/create/',views.dashboard_family_create,name='familycreate'),
-    # path('family/edit/<int:id>',views.dashboard_family_edit,name='familyedit'),
-
-    # #Bank
-    # path('bank/create/',views.dashboard_bank_create,name='bankaccountcreate'),
 
     # ---work-on-edit-view------#
-    # path('bank/edit/<int:id>/',views.employee_bank_account_update,name='accountedit'),
     path('leave/apply/', views.leave_creation, name='createleave'),
     path('leaves/pending/all/', views.leaves_list, name='leaveslist'),
     path('leaves/approved/all/', views.leaves_approved_list, name='approvedleaveslist'),
@@ -38,7 +28,6 @@ urlpatterns = [
     path('leaves/rejected/all/', views.leave_rejected_list, name='leavesrejected'),
     path('leave/reject/<int:id>/', views.reject_leave, name='reject'),
     path('leave/unreject/<int:id>/', views.unreject_leave, name='unreject'),
-    # BIRTHDAY ROUTE
-    # path('birthdays/all/',views.birthday_this_month,name='birthdays'),
+
 
 ]
