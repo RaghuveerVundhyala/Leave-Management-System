@@ -12,6 +12,7 @@ from employee.models import *
 from leave.forms import LeaveCreationForm
 from django.core.mail import send_mail
 from datetime import datetime
+from copy import copy
 
 status = 0
 date = 0
@@ -64,8 +65,15 @@ def dashboard(request):
 
     try:
         e = Employee.objects.get(user=user)
-        if currLeaveObj != pastLeaveObj or pastLeaveObj.status != pastStatus:
-            pastLeaveObj = currLeaveObj
+        exp = False
+        try:
+            if currLeaveObj == pastLeaveObj and currLeaveObj.status != pastLeaveObj.status:
+                exp = True
+        except:
+            pass
+
+        if currLeaveObj != pastLeaveObj or exp:
+            pastLeaveObj = copy(currLeaveObj)
             pastStatus = pastLeaveObj.status
             if currLeaveObj.status == "approved":
                 if currLeaveObj.leavetype == 'Unpaid':
@@ -259,32 +267,41 @@ def dashboard_employee_info(request, id):
 
 # ---------------------LEAVE-------------------------------------------
 def compDays(startDate, endDate):
-    #INCOMPLETE
-    return 10
+    date_format = '%Y-%m-%d'
+
+    # Convert date strings to datetime objects
+    date1 = datetime.strptime(startDate, date_format)
+    date2 = datetime.strptime(endDate, date_format)
+
+    # Compute the difference in days
+    delta = date2 - date1
+
+    # Return the absolute value of the difference in days
+    return abs(delta.days)
+
 
 def leave_creation(request):
     if not request.user.is_authenticated:
         return redirect('accounts:login')
     if request.method == 'POST':
         form = LeaveCreationForm(data=request.POST)
-
-        # leave applied for days
-        # and leave type  -- done
-        # query employee for leave balance. --
         valid = True
         leaveType = form.data
         leaveAppliedDays = compDays(leaveType["startdate"], leaveType["enddate"])
-        eObj = Employee.objects.filter(user=request.user)
+        eObj = Employee.objects.get(user=request.user)
         leaveType = leaveType["leavetype"]
         if leaveType == "Unpaid":
             if eObj.Unpaid < leaveAppliedDays:
-                valid =False
+                valid = False
         else:
             if eObj.Paid < leaveAppliedDays:
-                valid =False
+                valid = False
 
-
-        if form.is_valid() and valid:
+        if form.is_valid():
+            if not valid:
+                messages.error(request, 'Insufficient Leave Balance, Contact your ADMIN',
+                               extra_tags='alert alert-warning alert-dismissible show')
+                return redirect('dashboard:createleave')
             instance = form.save(commit=False)
             user = request.user
             instance.user = user

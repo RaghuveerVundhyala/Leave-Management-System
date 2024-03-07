@@ -44,13 +44,6 @@ class Leave(models.Model):
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
     created = models.DateTimeField(auto_now=False, auto_now_add=True)
 
-    # Unpaid = models.PositiveIntegerField(verbose_name=_('unPaidLeave'), default=5,
-    #                                      null=True,
-    #                                      blank=True)
-    # Paid = models.PositiveIntegerField(verbose_name=_('PaidLeave'), default=15,
-    #                                    null=True,
-    #                                    blank=True)
-
     objects = LeaveManager()
 
     Tempdays = 0
