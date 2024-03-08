@@ -59,9 +59,6 @@ class Leave(models.Model):
 
     @property
     def pretty_leave(self):
-        '''
-		i don't like the __str__ of leave object - this is a pretty one :-)
-		'''
         leave = self.leavetype
         user = self.user
         employee = user.employee_set.first().get_full_name
@@ -80,7 +77,7 @@ class Leave(models.Model):
         # summing all weekdays
         res = sum(1 for day in dates if day.weekday() < 5)
 
-        # holidayList = [datetime(2015, 6, 3)]
+        # holidayList
         if startdate.month == 12:  # dec month
             if startdate.day <= 25 or enddate.day >= 25:  # christmas
                 res = res - 1

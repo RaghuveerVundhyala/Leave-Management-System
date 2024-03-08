@@ -180,89 +180,16 @@ def dashboard_employees_create(request):
     return render(request, 'dashboard/employee_create.html', dataset)
 
 
-def employee_edit_data(request, id):
-    if not (request.user.is_authenticated and request.user.is_superuser and request.user.is_staff):
-        return redirect('/')
-    employee = get_object_or_404(Employee, id=id)
-    if request.method == 'POST':
-        form = EmployeeCreateForm(request.POST or None, request.FILES or None, instance=employee)
-        if form.is_valid():
-            instance = form.save(commit=False)
-
-            user = request.POST.get('user')
-            assigned_user = User.objects.get(id=user)
-
-            instance.user = assigned_user
-
-            instance.image = request.FILES.get('image')
-            instance.firstname = request.POST.get('firstname')
-            instance.lastname = request.POST.get('lastname')
-            instance.othername = request.POST.get('othername')
-
-            instance.birthday = request.POST.get('birthday')
-
-            religion_id = request.POST.get('religion')
-            religion = Religion.objects.get(id=religion_id)
-            instance.religion = religion
-
-            nationality_id = request.POST.get('nationality')
-            nationality = Nationality.objects.get(id=nationality_id)
-            instance.nationality = nationality
-
-            department_id = request.POST.get('department')
-            department = Department.objects.get(id=department_id)
-            instance.department = department
-
-            instance.hometown = request.POST.get('hometown')
-            instance.region = request.POST.get('region')
-            instance.residence = request.POST.get('residence')
-            instance.address = request.POST.get('address')
-            instance.education = request.POST.get('education')
-            instance.lastwork = request.POST.get('lastwork')
-            instance.position = request.POST.get('position')
-            instance.ssnitnumber = request.POST.get('ssnitnumber')
-            instance.tinnumber = request.POST.get('tinnumber')
-
-            role = request.POST.get('role')
-            role_instance = Role.objects.get(id=role)
-            instance.role = role_instance
-
-            instance.startdate = request.POST.get('startdate')
-            instance.employeetype = request.POST.get('employeetype')
-            instance.employeeid = request.POST.get('employeeid')
-            instance.dateissued = request.POST.get('dateissued')
-
-            # now = datetime.datetime.now()
-            # instance.created = now
-            # instance.updated = now
-
-            instance.save()
-            messages.success(request, 'Account Updated Successfully !!!',
-                             extra_tags='alert alert-success alert-dismissible show')
-            return redirect('dashboard:employees')
-
-        else:
-
-            messages.error(request, 'Error Updating account', extra_tags='alert alert-warning alert-dismissible show')
-            return HttpResponse("Form data not valid")
-
-    dataset = dict()
-    form = EmployeeCreateForm(request.POST or None, request.FILES or None, instance=employee)
-    dataset['form'] = form
-    dataset['title'] = 'edit - {0}'.format(employee.get_full_name)
-    return render(request, 'dashboard/employee_create.html', dataset)
-
-
-def dashboard_employee_info(request, id):
-    if request.user.is_authenticated:
-        return redirect('/')
-
-    employee = get_object_or_404(Employee, id=id)
-
-    dataset = dict()
-    dataset['employee'] = employee
-    dataset['title'] = 'profile - {0}'.format(employee.get_full_name)
-    return render(request, 'dashboard/employee_detail.html', dataset)
+# def dashboard_employee_info(request, id):
+#     if request.user.is_authenticated:
+#         return redirect('/')
+#
+#     employee = get_object_or_404(Employee, id=id)
+#
+#     dataset = dict()
+#     dataset['employee'] = employee
+#     dataset['title'] = 'profile - {0}'.format(employee.get_full_name)
+#     return render(request, 'dashboard/employee_detail.html', dataset)
 
 
 # ---------------------LEAVE-------------------------------------------

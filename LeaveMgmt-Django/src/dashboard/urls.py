@@ -9,11 +9,6 @@ urlpatterns = [
     # Employee
     path('employees/all/', views.dashboard_employees, name='employees'),
     path('employee/create/', views.dashboard_employees_create, name='employeecreate'),
-    path('employee/profile/<int:id>/', views.dashboard_employee_info, name='employeeinfo'),
-
-
-
-    # ---work-on-edit-view------#
     path('leave/apply/', views.leave_creation, name='createleave'),
     path('leaves/pending/all/', views.leaves_list, name='leaveslist'),
     path('leaves/approved/all/', views.leaves_approved_list, name='approvedleaveslist'),
