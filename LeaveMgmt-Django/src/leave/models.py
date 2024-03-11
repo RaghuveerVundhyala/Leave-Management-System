@@ -23,7 +23,7 @@ LEAVE_TYPE = (
     (Unpaid, 'Unpaid Leave'),
 )
 
-LeavePerYear = 20
+# LeavePerYear = 20
 
 
 class Leave(models.Model):
@@ -34,9 +34,6 @@ class Leave(models.Model):
     leavetype = models.CharField(choices=LEAVE_TYPE, max_length=25, default=SICK, null=True, blank=False)
     reason = models.CharField(verbose_name=_('Reason for Leave'), max_length=255,
                               help_text='add additional information for leave', null=True, blank=True)
-    defaultdays = models.PositiveIntegerField(verbose_name=_('Leave days per year counter'), default=LeavePerYear,
-                                              null=True,
-                                              blank=True)
 
     status = models.CharField(max_length=12, default='pending')  # pending,approved,rejected,cancelled
     is_approved = models.BooleanField(default=False)  # hide
@@ -53,9 +50,6 @@ class Leave(models.Model):
         verbose_name = _('Leave')
         verbose_name_plural = _('Leaves')
         ordering = ['-created']  # recent objects
-
-    # def __str__(self):
-    # 	return ('{0} - {1}'.format(self.leavetype,self.user))
 
     @property
     def pretty_leave(self):
@@ -114,7 +108,7 @@ class Leave(models.Model):
 
     def approve_leave(self, eObj):
         subject = 'Leave Approved'
-        message = f'Hi {eObj.firstname}, Your leave got approved.'
+        message = f'Hi {eObj.firstname}, this is to notify that your leave got approved.'
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [eObj.email]
         send_mail(subject, message, email_from, recipient_list)

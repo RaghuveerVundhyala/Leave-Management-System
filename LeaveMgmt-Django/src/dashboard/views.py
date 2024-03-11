@@ -180,18 +180,6 @@ def dashboard_employees_create(request):
     return render(request, 'dashboard/employee_create.html', dataset)
 
 
-# def dashboard_employee_info(request, id):
-#     if request.user.is_authenticated:
-#         return redirect('/')
-#
-#     employee = get_object_or_404(Employee, id=id)
-#
-#     dataset = dict()
-#     dataset['employee'] = employee
-#     dataset['title'] = 'profile - {0}'.format(employee.get_full_name)
-#     return render(request, 'dashboard/employee_detail.html', dataset)
-
-
 # ---------------------LEAVE-------------------------------------------
 def compDays(startDate, endDate):
     date_format = '%Y-%m-%d'
@@ -277,7 +265,6 @@ def leaves_view(request, id):
     print(leave.user)
 
     employee = Employee.objects.filter(user=leave.user)
-    # o1 = employee.models.fullname
     print(employee)
 
     return render(request, 'dashboard/leave_detail_view.html',
@@ -291,11 +278,11 @@ def approve_leave(request, id):
         return redirect('/')
     leave = get_object_or_404(Leave, id=id)
     user = leave.user
-    employee = Employee.objects.filter(user=user)[0]
+    # employee = Employee.objects.filter(user=user)[0]
     e = Employee.objects.get(user=user)
     leave.approve_leave(e)
 
-    messages.error(request, 'Leave successfully approved for {0}'.format(employee.get_full_name),
+    messages.error(request, 'Leave successfully approved for {0}'.format(e.get_full_name),
                    extra_tags='alert alert-success alert-dismissible show')
     return redirect('dashboard:userleaveview', id=id)
 
