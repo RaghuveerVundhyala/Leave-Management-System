@@ -1,11 +1,9 @@
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models import Q
 from django.contrib import messages
-from django.urls import reverse
 from employee.forms import EmployeeCreateForm
 from leave.models import Leave
 from employee.models import *
@@ -35,13 +33,6 @@ def compare_dates(date1, date2):
 
 
 def dashboard(request):
-    """
-	Summary of all apps - display here with charts etc.
-	eg.lEAVE - PENDING|APPROVED|RECENT|REJECTED - TOTAL THIS MONTH or NEXT MONTH
-	EMPLOYEE - TOTAL | GENDER
-	CHART - AVERAGE EMPLOYEE AGES
-	"""
-
     global status
     global date
     global pastLeaveObj
@@ -130,7 +121,7 @@ def dashboard_employees(request):
     page = request.GET.get('page')
     employees_paginated = paginator.get_page(page)
 
-    blocked_employees = Employee.objects.all_blocked_employees()
+    # blocked_employees = Employee.objects.all_blocked_employees()
 
     return render(request, 'dashboard/employee_app.html', dataset)
 
@@ -163,7 +154,7 @@ def dashboard_employees_create(request):
             instance.startdate = request.POST.get('startdate')
             instance.employeetype = request.POST.get('employeetype')
             instance.employeeid = request.POST.get('employeeid')
-            instance.dateissued = request.POST.get('dateissued')
+            # instance.dateissued = request.POST.get('dateissued')
 
             instance.save()
 
@@ -180,7 +171,6 @@ def dashboard_employees_create(request):
     return render(request, 'dashboard/employee_create.html', dataset)
 
 
-# ---------------------LEAVE-------------------------------------------
 def compDays(startDate, endDate):
     date_format = '%Y-%m-%d'
 
@@ -265,6 +255,7 @@ def leaves_view(request, id):
     print(leave.user)
 
     employee = Employee.objects.filter(user=leave.user)
+    # o1 = employee.models.fullname
     print(employee)
 
     return render(request, 'dashboard/leave_detail_view.html',
@@ -278,11 +269,11 @@ def approve_leave(request, id):
         return redirect('/')
     leave = get_object_or_404(Leave, id=id)
     user = leave.user
-    # employee = Employee.objects.filter(user=user)[0]
+    employee = Employee.objects.filter(user=user)[0]
     e = Employee.objects.get(user=user)
     leave.approve_leave(e)
 
-    messages.error(request, 'Leave successfully approved for {0}'.format(e.get_full_name),
+    messages.error(request, 'Leave successfully approved for {0}'.format(employee.get_full_name),
                    extra_tags='alert alert-success alert-dismissible show')
     return redirect('dashboard:userleaveview', id=id)
 
@@ -312,7 +303,6 @@ def cancel_leave(request, id):
     return redirect('dashboard:canceleaveslist')  # work on redirecting to instance leave - detail view
 
 
-# Current section -> here
 def uncancel_leave(request, id):
     if not (request.user.is_superuser and request.user.is_authenticated):
         return redirect('/')
@@ -338,15 +328,12 @@ def reject_leave(request, id):
     leave = get_object_or_404(Leave, id=id)
 
     user = leave.user
-    # l = Leave.objects.get(user=user)
     e = Employee.objects.get(user=user)
     leave.reject_leave(e)
 
     messages.success(request, 'Leave is rejected', extra_tags='alert alert-success alert-dismissible show')
     return redirect('dashboard:leavesrejected')
 
-
-# return HttpResponse(id)
 
 
 def unreject_leave(request, id):

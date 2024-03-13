@@ -23,8 +23,6 @@ LEAVE_TYPE = (
     (Unpaid, 'Unpaid Leave'),
 )
 
-# LeavePerYear = 20
-
 
 class Leave(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
@@ -35,7 +33,7 @@ class Leave(models.Model):
     reason = models.CharField(verbose_name=_('Reason for Leave'), max_length=255,
                               help_text='add additional information for leave', null=True, blank=True)
 
-    status = models.CharField(max_length=12, default='pending')  # pending,approved,rejected,cancelled
+    status = models.CharField(max_length=12, default='pending')
     is_approved = models.BooleanField(default=False)  # hide
 
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
@@ -71,7 +69,7 @@ class Leave(models.Model):
         # summing all weekdays
         res = sum(1 for day in dates if day.weekday() < 5)
 
-        # holidayList
+        # holidayList = [datetime(YYYY, M, D)]
         if startdate.month == 12:  # dec month
             if startdate.day <= 25 or enddate.day >= 25:  # christmas
                 res = res - 1
@@ -108,7 +106,7 @@ class Leave(models.Model):
 
     def approve_leave(self, eObj):
         subject = 'Leave Approved'
-        message = f'Hi {eObj.firstname}, this is to notify that your leave got approved.'
+        message = f'Hi {eObj.firstname}, Your leave got approved.'
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [eObj.email]
         send_mail(subject, message, email_from, recipient_list)

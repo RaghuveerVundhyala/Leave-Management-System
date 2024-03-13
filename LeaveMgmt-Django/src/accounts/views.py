@@ -1,13 +1,12 @@
 # from DSEmp.employee_details import Employee
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
-from django.urls import reverse
-from django.contrib import messages
-from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
 from employee.models import *
+
 from .forms import UserLogin, UserAddForm
 
 
@@ -90,32 +89,3 @@ def logout_view(request):
 def users_list(request):
     employees = Employee.objects.all()
     return render(request, 'accounts/users_table.html', {'employees': employees, 'title': 'Employee List'})
-
-
-def users_unblock(request, id):
-    user = get_object_or_404(User, id=id)
-    emp = Employee.objects.filter(user=user).first()
-    emp.is_blocked = False
-    emp.save()
-    user.is_active = True
-    user.save()
-
-    return redirect('accounts:users')
-
-
-def users_block(request, id):
-    user = get_object_or_404(User, id=id)
-    emp = Employee.objects.filter(user=user).first()
-    emp.is_blocked = True
-    emp.save()
-
-    user.is_active = False
-    user.save()
-
-    return redirect('accounts:users')
-
-
-def users_blocked_list(request):
-    blocked_employees = Employee.objects.all_blocked_employees()
-    return render(request, 'accounts/all_deleted_users.html',
-                  {'employees': blocked_employees, 'title': 'blocked users list'})

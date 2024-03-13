@@ -10,17 +10,14 @@ class EmployeeManager(models.Manager):
 
 
     def all_employees(self):
-        '''
-        Employee.objexts.all_employee() -> returns all employees including deleted one's
-        NB: don't specify filter. ***
-        '''
+
         return super().get_queryset()
 
 
-    def all_blocked_employees(self):
-        '''
-        Employee.objects.all_blocked_employees() -> returns list of blocked employees ie.is_blocked = True
-        '''
-        return super().get_queryset().filter(is_blocked=True)
+    # def all_blocked_employees(self):
+    #     '''
+    #     Employee.objects.all_blocked_employees() -> returns list of blocked employees ie.is_blocked = True
+    #     '''
+    #     return super().get_queryset().filter(is_blocked=True)
 
 

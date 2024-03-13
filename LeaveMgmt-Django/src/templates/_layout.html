@@ -13,7 +13,7 @@
 
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'/>
     <meta name="viewport" content="width=device-width"/>
-    <meta name="author" content="Raghu: raghuvindhyala@gmail.com">
+    <meta name="author" content="Raghu: raghu2022@my.fit.edu">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Anton|Russo+One" rel="stylesheet">
@@ -197,17 +197,6 @@
 
 <script type="text/javascript">
 
-
-    function previewImage(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $('.prev-holder .prev-avatar').attr('src', e.target.result);
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
     
     $(document).ready(function(){
 
@@ -216,11 +205,6 @@
             console.log('refresh page clicked !!!');
             location.reload(true);
 
-        });
-
-
-        $( "#id_birthday,#id_dateissued,#id_startdate,#id_enddate" ).datepicker({
-            dateFormat: 'yy-mm-dd'
         });
 
 
