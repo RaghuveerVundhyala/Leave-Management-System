@@ -1,82 +1,104 @@
 {% extends '_layout.html' %}
 
-<!--{% block title %} {{ title }} {% endblock %}-->
+{% block title %} {{ title }} {% endblock %}
 
 {% block stylesheet %}
-.sec-box{
-height:160px;
-max-width:100%;
-line-height:160px;
-text-align:center;
-position:relative;
-font-size:1.9rem;
-font-variant: petite-caps;
 
-}
+    .sec-box {
+        height: 160px;
+        max-width: 100%;
+        line-height: 160px;
+        text-align: center;
+        position: relative;
+        font-size: 1.9rem;
+        font-variant: petite-caps;
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        overflow: hidden;
+    }
 
-.sec-box a{           /*fonts color in the both blocks*/
-color:#fff;
+    .sec-box a {
+        color: #fff;
+        text-decoration: none;
+    }
 
-}
+    .employee-box {
+        background: linear-gradient(to right, #f77062, #fe5196);
+    }
 
-.employee-box{
-background: #5a4747;
-}
+    .leave-box {
+        background: linear-gradient(to right, #00c6ff, #0072ff);
+    }
 
-.leave-box{
-background: #5a4747;
-}
+    .sec-box:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
 
+    .row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .col-lg-4 {
+        flex: 0 0 calc(33.333% - 10px);
+    }
+
+    @media (max-width: 768px) {
+        .col-lg-4 {
+            flex: 0 0 100%;
+            margin-bottom: 20px;
+        }
+    }
+
+    /* Add background image to content section */
+    .content {
+        background-image: url("/static_in_proj/our_static/authenticated_Image.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
 
 {% endblock %}
 
-
-<!--CONTENTS-->
+<!-- CONTENTS -->
 {% block content %}
 <section class="content">
     <section class="container-fluid">
-        <section class="row">
+        <div class="row">
             {% if request.user.is_superuser and request.user.is_staff %}
-            <section class="col col-lg-4">
+            <div class="col-lg-5">
                 <div class="employee-box sec-box">
-                    <a href="">
-                        <span style="font-size: 24px;">Registered Employees:  {{ employees.count }}</span>
+                    <a href="#">
+                        <span>Registered Employees: {{ employees.count }}</span>
                     </a>
                 </div>
-            </section>
-            <section class="col col-lg-4">
+            </div>
+            <div class="col-lg-5">
                 <div class="leave-box sec-box">
-                    <a href="">
-                        <span style="font-size: 24px;">Leaves Requested: {{ leaves.count }}</span>
+                    <a href="#">
+                        <span>Leaves Requested: {{ leaves.count }}</span>
                     </a>
-                    <!-- <span class="count-object" style="color:#41b6d6;"></span>  -->
                 </div>
-            </section>
-
+            </div>
             {% else %}
-            <section class="col col-lg-6">
-                <div class="leave-box sec-box">
-                    <a href="">
-                        <span> Remaining Paid Leaves: {{ remLeavePaid }}</span>
+            <div class="col-lg-5">
+                <div class="employee-box sec-box">
+                    <a href="#">
+                        <span>Remaining Paid Leaves: {{ remLeavePaid }}</span>
                     </a>
                 </div>
+            </div>
+            <div class="col-lg-5">
                 <div class="leave-box sec-box">
-                    <a href="">
-                        <span> Remaining Unpaid Leaves: {{ remLeaveUnpaid }}</span>
+                    <a href="#">
+                        <span>Remaining Unpaid Leaves: {{ remLeaveUnpaid }}</span>
                     </a>
                 </div>
-            </section>
-
-
+            </div>
             {% endif %}
-
-
-        </section>
-
-
+        </div>
     </section>
-
 </section>
-
-
 {% endblock %}

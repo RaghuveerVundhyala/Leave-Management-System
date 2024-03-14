@@ -15,12 +15,14 @@ SICK = 'sick'
 CASUAL = 'casual'
 EMERGENCY = 'emergency'
 Unpaid = 'Unpaid'
+Other = 'Other'
 
 LEAVE_TYPE = (
     (SICK, 'Sick Leave'),
     (CASUAL, 'Casual Leave'),
     (EMERGENCY, 'Emergency Leave'),
     (Unpaid, 'Unpaid Leave'),
+    (Other, 'Other')
 )
 
 
@@ -33,7 +35,7 @@ class Leave(models.Model):
     reason = models.CharField(verbose_name=_('Reason for Leave'), max_length=255,
                               help_text='add additional information for leave', null=True, blank=True)
 
-    status = models.CharField(max_length=12, default='pending')
+    status = models.CharField(max_length=12, default='pending')  # pending,approved,rejected,cancelled
     is_approved = models.BooleanField(default=False)  # hide
 
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
@@ -69,7 +71,7 @@ class Leave(models.Model):
         # summing all weekdays
         res = sum(1 for day in dates if day.weekday() < 5)
 
-        # holidayList = [datetime(YYYY, M, D)]
+        # holidayList
         if startdate.month == 12:  # dec month
             if startdate.day <= 25 or enddate.day >= 25:  # christmas
                 res = res - 1
@@ -106,7 +108,7 @@ class Leave(models.Model):
 
     def approve_leave(self, eObj):
         subject = 'Leave Approved'
-        message = f'Hi {eObj.firstname}, Your leave got approved.'
+        message = f'Hi {eObj.firstname}, this is to notify that your leave got approved.'
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [eObj.email]
         send_mail(subject, message, email_from, recipient_list)

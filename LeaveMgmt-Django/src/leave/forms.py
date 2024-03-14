@@ -9,15 +9,14 @@ class LeaveCreationForm(forms.ModelForm):
     class Meta:
         model = Leave
         exclude = ['user', 'defaultdays', 'hrcomments', 'status', 'is_approved', 'updated', 'created']
-
+        widgets = {
+            'startdate': forms.DateInput(attrs={'type': 'date'}),
+            'enddate': forms.DateInput(attrs={'type': 'date'})
+        }
     def clean_enddate(self):
         enddate = self.cleaned_data['enddate']
         startdate = self.cleaned_data['startdate']
         today_date = datetime.date.today()
-        # if startdate.month() ==
-
-        # print("\n\n\nclean_enddate", startdate.month)
-
         if (startdate or enddate) < today_date:  # both dates must not be in the past
             raise forms.ValidationError("Selected dates are incorrect,please select again")
 

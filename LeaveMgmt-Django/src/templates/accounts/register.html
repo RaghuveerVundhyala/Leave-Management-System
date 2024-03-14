@@ -75,7 +75,7 @@
                         <section class="col-lg-12 col-md-12 col-sm-12">
                             <form action="" method="POST">
                                 {% csrf_token %}
-                                {{form  }}
+                                {{form | crispy }}
                                 <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
                             </form>
                         </section>
