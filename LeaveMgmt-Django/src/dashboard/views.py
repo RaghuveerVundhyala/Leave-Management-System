@@ -35,12 +35,6 @@ def compare_dates(date1, date2):
 
 
 def dashboard(request):
-    """
-	Summary of all apps - display here with charts etc.
-	eg.lEAVE - PENDING|APPROVED|RECENT|REJECTED - TOTAL THIS MONTH or NEXT MONTH
-	EMPLOYEE - TOTAL | GENDER
-	CHART - AVERAGE EMPLOYEE AGES
-	"""
 
     global status
     global date

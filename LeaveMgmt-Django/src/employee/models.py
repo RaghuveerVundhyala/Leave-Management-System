@@ -89,9 +89,6 @@ class Employee(models.Model):
 
     # PERSONAL DATA
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-
-    # image = models.FileField(_('Profile Image'), upload_to='profiles', default='default.png', blank=True, null=True,
-    #                          help_text='upload image size less than 2.0MB')  # work on path username-date/image
     firstname = models.CharField(_('Firstname'), max_length=125, null=False, blank=False)
     lastname = models.CharField(_('Lastname'), max_length=125, null=False, blank=False)
     othername = models.CharField(_('Othername (optional)'), max_length=125, null=True, blank=True)
@@ -114,9 +111,6 @@ class Employee(models.Model):
                                        blank=True)
 
     email = models.CharField(_('Email'), max_length=50, null=False, blank=False)
-    #email_pass = models.CharField(_('Email Password'), max_length=50, null=False, blank=False)
-
-
     # app related
     is_blocked = models.BooleanField(_('Is Blocked'), help_text='button to toggle employee block and unblock',
                                      default=False)
