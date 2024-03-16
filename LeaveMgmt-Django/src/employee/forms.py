@@ -10,7 +10,7 @@ class EmployeeCreateForm(forms.ModelForm):
 
     class Meta:
         model = Employee
-        exclude = ['is_blocked', 'is_deleted', 'created', 'updated']
+        exclude = ['created', 'updated']
         widgets = {
             'bio': forms.Textarea(attrs={'cols': 5, 'rows': 5}),
             'birthday': forms.DateInput(attrs={'type': 'date'}),

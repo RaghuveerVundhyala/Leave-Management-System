@@ -112,10 +112,10 @@ class Employee(models.Model):
 
     email = models.CharField(_('Email'), max_length=50, null=False, blank=False)
     # app related
-    is_blocked = models.BooleanField(_('Is Blocked'), help_text='button to toggle employee block and unblock',
-                                     default=False)
-    is_deleted = models.BooleanField(_('Is Deleted'), help_text='button to toggle employee deleted and undelete',
-                                     default=False)
+    # is_blocked = models.BooleanField(_('Is Blocked'), help_text='button to toggle employee block and unblock',
+    #                                  default=False)
+    # is_deleted = models.BooleanField(_('Is Deleted'), help_text='button to toggle employee deleted and undelete',
+    #                                  default=False)
 
     created = models.DateTimeField(verbose_name=_('Created'), auto_now_add=True, null=True)
     updated = models.DateTimeField(verbose_name=_('Updated'), auto_now=True, null=True)

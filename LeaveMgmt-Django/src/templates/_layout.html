@@ -83,6 +83,7 @@
         {% endblock %}
     </style>
 
+
 </head>
 <body>
 
@@ -103,7 +104,7 @@
                     </a>
                 </li>
 
-                {% if request.user.is_superuser and request.user.is_staff %}
+                {% if request.user.is_superuser %}
                 <li class="{% if request.resolver_match.url_name == 'employees' %}active{% endif %}">
                     <a href="{% url 'dashboard:employees' %}">
                         <i class="pe-7s-users"></i>

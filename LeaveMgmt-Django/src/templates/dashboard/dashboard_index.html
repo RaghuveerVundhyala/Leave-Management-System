@@ -4,6 +4,7 @@
 
 {% block stylesheet %}
 
+
     .sec-box {
         height: 160px;
         max-width: 100%;
@@ -51,15 +52,6 @@
             margin-bottom: 20px;
         }
     }
-
-    /* Add background image to content section */
-    .content {
-        background-image: url("/static_in_proj/our_static/authenticated_Image.jpg");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-    }
-
 {% endblock %}
 
 <!-- CONTENTS -->
@@ -67,7 +59,7 @@
 <section class="content">
     <section class="container-fluid">
         <div class="row">
-            {% if request.user.is_superuser and request.user.is_staff %}
+            {% if request.user.is_superuser %}
             <div class="col-lg-5">
                 <div class="employee-box sec-box">
                     <a href="#">

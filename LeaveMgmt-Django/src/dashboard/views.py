@@ -104,7 +104,7 @@ def dashboard(request):
 
 
 def dashboard_employees(request):
-    if not (request.user.is_authenticated and request.user.is_superuser and request.user.is_staff):
+    if not (request.user.is_authenticated and request.user.is_superuser):
         return redirect('/')
 
     dataset = dict()
@@ -124,13 +124,12 @@ def dashboard_employees(request):
     page = request.GET.get('page')
     employees_paginated = paginator.get_page(page)
 
-    blocked_employees = Employee.objects.all_blocked_employees()
 
     return render(request, 'dashboard/employee_app.html', dataset)
 
 
 def dashboard_employees_create(request):
-    if not (request.user.is_authenticated and request.user.is_superuser and request.user.is_staff):
+    if not (request.user.is_authenticated and request.user.is_superuser):
         return redirect('/')
 
     if request.method == 'POST':
@@ -157,7 +156,6 @@ def dashboard_employees_create(request):
             instance.startdate = request.POST.get('startdate')
             instance.employeetype = request.POST.get('employeetype')
             instance.employeeid = request.POST.get('employeeid')
-            instance.dateissued = request.POST.get('dateissued')
 
             instance.save()
 
@@ -238,21 +236,21 @@ def leave_creation(request):
 
 
 def leaves_list(request):
-    if not (request.user.is_staff and request.user.is_superuser):
+    if not request.user.is_superuser:
         return redirect('/')
     leaves = Leave.objects.all_pending_leaves()
     return render(request, 'dashboard/leaves_recent.html', {'leave_list': leaves, 'title': 'leaves list - pending'})
 
 
 def leaves_approved_list(request):
-    if not (request.user.is_superuser and request.user.is_staff):
+    if not request.user.is_superuser:
         return redirect('/')
     leaves = Leave.objects.all_approved_leaves()  # approved leaves -> calling model manager method
     return render(request, 'dashboard/leaves_approved.html', {'leave_list': leaves, 'title': 'approved leave list'})
 
 
 def leaves_view(request, id):
-    if not (request.user.is_authenticated):
+    if not request.user.is_authenticated:
         return redirect('/')
 
     leave = get_object_or_404(Leave, id=id)

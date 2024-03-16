@@ -13,6 +13,7 @@ class LeaveCreationForm(forms.ModelForm):
             'startdate': forms.DateInput(attrs={'type': 'date'}),
             'enddate': forms.DateInput(attrs={'type': 'date'})
         }
+
     def clean_enddate(self):
         enddate = self.cleaned_data['enddate']
         startdate = self.cleaned_data['startdate']
