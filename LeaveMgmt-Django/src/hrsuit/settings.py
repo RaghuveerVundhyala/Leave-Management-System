@@ -12,7 +12,7 @@ SECRET_KEY = 'This Is Secret'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app']
+ALLOWED_HOSTS = []
 
 # Email Settings
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
