@@ -20,8 +20,18 @@ pastLeaveObj = None
 pastStatus = None
 
 
+# Function to compare dates
 def compare_dates(date1, date2):
-    # convert string to date
+    """
+        Compare two dates.
+
+        Args:
+        date1 (datetime): First date.
+        date2 (datetime): Second date.
+
+        Returns:
+        bool: True if date1 is later than date2, False otherwise.
+        """
     flag = False
     if date1.date() > date2.date():
         flag = True
@@ -34,19 +44,28 @@ def compare_dates(date1, date2):
     return flag
 
 
+# Dashboard view function
 def dashboard(request):
-
     global status
     global date
     global pastLeaveObj
     global pastStatus
     dataset = dict()
     user = request.user
-
+    # Redirect to login page if user is not authenticated
     if not request.user.is_authenticated:
         return redirect('accounts:login')
 
     employees = Employee.objects.all()
+    if request.user.username == "Raghuveer":
+        employees = Employee.objects.filter(department_id=3)
+        pass
+    if request.user.username == "Akhil":
+        employees = Employee.objects.filter(department_id=4)
+        pass
+    if request.user.username == "Vasu":
+        employees = Employee.objects.filter(department_id=2)
+        pass
     leaves = Leave.objects.all_pending_leaves()
     staff_leaves = Leave.objects.filter(user=user)
 
@@ -72,25 +91,19 @@ def dashboard(request):
             if currLeaveObj.status == "approved":
                 if currLeaveObj.leavetype == 'Unpaid':
                     e.Unpaid = e.Unpaid - currLeaveObj.leave_days
-                    e.save()
                 else:
                     e.Paid = e.Paid - currLeaveObj.leave_days
-                    e.save()
-            elif currLeaveObj.status == "cancelled" or currLeaveObj.status == "rejected":
+            elif currLeaveObj.status == "cancelled":
                 if currLeaveObj.leavetype == 'Unpaid':
                     e.Unpaid = e.Unpaid + currLeaveObj.leave_days
-                    e.save()
                 else:
                     e.Paid = e.Paid + currLeaveObj.leave_days
-                    e.save()
-            else:
-                e.Paid = e.Paid
-                e.Unpaid = e.Unpaid
-                e.save()
+            e.save()
+
         print("dashboard/views", e.Paid, e.Unpaid)
         dataset['remLeavePaid'] = e.Paid
         dataset['remLeaveUnpaid'] = e.Unpaid
-    except:
+    except Employee.DoesNotExist:
         pass
     dataset['employees'] = employees
 
@@ -109,7 +122,17 @@ def dashboard_employees(request):
 
     dataset = dict()
     departments = Department.objects.all()
-    employees = Employee.objects.all()
+    # employees = Employee.objects.all()
+
+    if request.user.username == "Raghuveer":
+        employees = Employee.objects.filter(department_id=3)
+        pass
+    if request.user.username == "Akhil":
+        employees = Employee.objects.filter(department_id=4)
+        pass
+    if request.user.username == "Vasu":
+        employees = Employee.objects.filter(department_id=2)
+        pass
 
     # pagination
     query = request.GET.get('search')
@@ -123,7 +146,6 @@ def dashboard_employees(request):
 
     page = request.GET.get('page')
     employees_paginated = paginator.get_page(page)
-
 
     return render(request, 'dashboard/employee_app.html', dataset)
 
@@ -140,14 +162,9 @@ def dashboard_employees_create(request):
             assigned_user = User.objects.get(id=user)
 
             instance.user = assigned_user
-
-            instance.title = request.POST.get('title')
-            instance.image = request.FILES.get('image')
             instance.firstname = request.POST.get('firstname')
             instance.lastname = request.POST.get('lastname')
             instance.othername = request.POST.get('othername')
-
-            instance.birthday = request.POST.get('birthday')
 
             role = request.POST.get('role')
             role_instance = Role.objects.get(id=role)
@@ -161,7 +178,7 @@ def dashboard_employees_create(request):
 
             return redirect('dashboard:employees')
         else:
-            messages.error(request, 'Trying to create dublicate employees with a single user account ',
+            messages.error(request, 'Trying to create duplicate employees with a single user account ',
                            extra_tags='alert alert-warning alert-dismissible show')
             return redirect('dashboard:employeecreate')
 
@@ -190,6 +207,7 @@ def compDays(startDate, endDate):
 def leave_creation(request):
     if not request.user.is_authenticated:
         return redirect('accounts:login')
+
     if request.method == 'POST':
         form = LeaveCreationForm(data=request.POST)
         valid = True
@@ -214,19 +232,39 @@ def leave_creation(request):
             instance.user = user
             instance.save()
             e = Employee.objects.get(user=user)
-            messages.success(request, 'Leave Request Sent,wait for Admins response',
+            dep_id = e.department.name
+            messages.success(request, 'Leave Request Sent, wait for Admins response',
                              extra_tags='alert alert-success alert-dismissible show')
             subject = 'New Leave Application'
-            message = f'{e.firstname}, applied leaves.'
+            message = f'''Hello, this to notify that {e.firstname}, applied leaves.
+                      Thanks,
+                      Team LMS'''
             email_from = settings.EMAIL_HOST_USER
-            recipient_list = ['rvundhyala2022@my.fit.edu']
-            send_mail(subject, message, email_from, recipient_list)
+
+            recipient_list = []  # Initialize with an empty list
+
+            if dep_id == 'Finance':
+                recipient_list = ['rvundhyala2022@my.fit.edu']
+
+            elif dep_id == 'Engineering':
+                recipient_list = ['vkola2023@my.fit.edu']
+            elif dep_id == 'Sales':
+                recipient_list = ['bkuppala2022@my.fit.edu']
+
+            print(recipient_list)  # Check if recipient_list is populated correctly
+            send_mail(subject, message, email_from, recipient_list)  # Send email
 
             return redirect('dashboard:createleave')
 
-        messages.error(request, 'failed to Request a Leave,please check entry dates',
+        messages.error(request, 'Failed to request a leave, please check entry dates',
                        extra_tags='alert alert-warning alert-dismissible show')
         return redirect('dashboard:createleave')
+
+    dataset = dict()
+    form = LeaveCreationForm()
+    dataset['form'] = form
+    dataset['title'] = 'Apply for Leave'
+    return render(request, 'dashboard/create_leave.html', dataset)
 
     dataset = dict()
     form = LeaveCreationForm()
@@ -326,19 +364,33 @@ def leave_rejected_list(request):
 
 
 def reject_leave(request, id):
-    dataset = dict()
     leave = get_object_or_404(Leave, id=id)
-
     user = leave.user
-    # l = Leave.objects.get(user=user)
     e = Employee.objects.get(user=user)
+
+    # Check if the leave is approved or pending
+    if leave.status == 'approved':
+        # For approved leave getting rejected, increment leave count
+        print("approve")
+        if leave.leavetype == 'Unpaid':
+            e.Unpaid += leave.leave_days
+        else:
+            e.Paid += leave.leave_days
+    elif leave.status == 'pending':
+        print("rej loop",e.Paid)
+        pass
+    else:
+        # For other cases, do nothing
+        pass
+
     leave.reject_leave(e)
+    e.save()
 
     messages.success(request, 'Leave is rejected', extra_tags='alert alert-success alert-dismissible show')
     return redirect('dashboard:leavesrejected')
 
 
-# return HttpResponse(id)
+
 
 
 def unreject_leave(request, id):

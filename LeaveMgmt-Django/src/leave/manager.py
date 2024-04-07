@@ -14,6 +14,8 @@ class LeaveManager(models.Manager):
         # gets all pending leaves -> Leave.objects.all_pending_leaves()
         return super().get_queryset().filter(status='pending').order_by('-created')  # applying FIFO
 
+
+
     def all_cancel_leaves(self):
         return super().get_queryset().filter(status='cancelled').order_by('-created')
 
@@ -21,7 +23,6 @@ class LeaveManager(models.Manager):
         return super().get_queryset().filter(status='rejected').order_by('-created')
 
     def all_approved_leaves(self):
-
         return super().get_queryset().filter(status='approved')
 
     def current_year_leaves(self):

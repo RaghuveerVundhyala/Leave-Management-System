@@ -3,6 +3,7 @@ from .models import Leave
 import datetime
 
 
+# form for leave application
 class LeaveCreationForm(forms.ModelForm):
     reason = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 4, 'cols': 40}))
 
@@ -14,6 +15,7 @@ class LeaveCreationForm(forms.ModelForm):
             'enddate': forms.DateInput(attrs={'type': 'date'})
         }
 
+    # validation for the selection of dates
     def clean_enddate(self):
         enddate = self.cleaned_data['enddate']
         startdate = self.cleaned_data['startdate']
@@ -21,7 +23,7 @@ class LeaveCreationForm(forms.ModelForm):
         if (startdate or enddate) < today_date:  # both dates must not be in the past
             raise forms.ValidationError("Selected dates are incorrect,please select again")
 
-        elif startdate >= enddate:  # TRUE -> FUTURE DATE > PAST DATE,FALSE other wise
+        elif startdate >= enddate:  # TRUE -> FUTURE DATE > PAST DATE,FALSE otherwise
             raise forms.ValidationError("Selected dates are wrong")
 
         return enddate

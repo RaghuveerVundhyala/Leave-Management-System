@@ -6,7 +6,7 @@ app_name = 'dashboard'
 urlpatterns = [
     path('welcome/', views.dashboard, name='dashboard'),
 
-    # Employee
+    # endpoint paths for viewing, applying, approving, cancelling leaves
     path('employees/all/', views.dashboard_employees, name='employees'),
     path('employee/create/', views.dashboard_employees_create, name='employeecreate'),
     path('leave/apply/', views.leave_creation, name='createleave'),

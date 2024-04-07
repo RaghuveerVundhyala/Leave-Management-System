@@ -1,92 +1,89 @@
-
 {% extends '_layout.html' %}
 
 {% block title %} {{ title }} {% endblock %}
 
- {% block navheader %}
- 	{% include 'includes/navheader_employee_app.html' %}
- {% endblock %}
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
 
- {% block stylesheet %}
+{% block stylesheet %}
 
-	.pe-7s-lock,.pe-7s-unlock{
-		font-size: 16px;
-	    font-weight: 600;
-	}
+.pe-7s-lock,.pe-7s-unlock{
+font-size: 16px;
+font-weight: 600;
+}
 
-	.pe-7s-unlock{
-		color:#22c322;
-	}
+.pe-7s-unlock{
+color:#22c322;
+}
 
-	.pe-7s-lock{
-		color:#dc233c;
-	}
+.pe-7s-lock{
+color:#dc233c;
+}
 
-	.table-shadow{
-		background: white;
-    	padding: 2%;
-    	-webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(	0,0,0,0.2);
-    	box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
-	}
+.table-shadow{
+background: white;
+padding: 2%;
+-webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(    0,0,0,0.2);
+box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+}
 
-	h4{
-	margin:2px 0 5px 0 !important;
-	}
+h4{
+margin:2px 0 5px 0 !important;
+}
 
-	.table-description{
+.table-description{
 
-		<!-- GOOGLE FONTS-STYLE -->
-	}
+<!-- GOOGLE FONTS-STYLE -->
+}
 
-	.download-print-action{
-		padding-bottom: 12px;
-	}
+.download-print-action{
+padding-bottom: 12px;
+}
 
 {% endblock %}
-        <!--CONTENTS-->
- }
- {% block content %}
-        <section class="content">
+<!--CONTENTS-->
+}
+{% block content %}
+<section class="content">
 
-            <section class="container-fluid">
-                	<!-- TABLE -->
-                	<div class="table-shadow">
-                		<div class="text-center table-description">
-                			<h4 class="title-h3">Application Users</h4>
-                		</div>
+    <section class="container-fluid">
+        <!-- TABLE -->
+        <div class="table-shadow">
+            <div class="text-center table-description">
+                <h4 class="title-h3">Application Users</h4>
+            </div>
 
-                		<table class="table">
-							  <thead>
-							    <tr>
-							      <th scope="col">Username</th>
-							      <th scope="col">Employee (fullname) </th>
-							      <th scope="col">Department</th>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Username</th>
+                    <th scope="col">Employee (fullname)</th>
+                    <th scope="col">Department</th>
 
-							    </tr>
-							  </thead>
+                </tr>
+                </thead>
 
-							  <tbody>
-							  	{% for emp in employees %}
-							  	<tr>
-								      <td>{{emp.user.username}}</td>
-								      <td>{{ emp.get_full_name }}</td>
-								      <td>{{ emp.department }}</td>
-
-
-								      
-								   
-							  </tr>
-							   {% endfor %}
-							  </tbody>
-						</table>
-					</div>
-                	<!-- /TABLE -->
-
-            </section> <!-- /container --> 
+                <tbody>
+                {% for emp in employees %}
+                <tr>
+                    <td>{{emp.user.username}}</td>
+                    <td>{{ emp.get_full_name }}</td>
+                    <td>{{ emp.department }}</td>
 
 
-        </section>
- {% endblock %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- /TABLE -->
+
+    </section> <!-- /container -->
+
+
+</section>
+{% endblock %}
 
 <script type="text/javascript">
 {% block extrajs%}
@@ -104,4 +101,5 @@
 // });
 
 {% endblock %}
+
 </script>

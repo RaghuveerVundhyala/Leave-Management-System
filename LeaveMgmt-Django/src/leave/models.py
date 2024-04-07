@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 import certifi
 
-# Create your models here.
+# Type of reasons for leave
 SICK = 'sick'
 CASUAL = 'casual'
 EMERGENCY = 'emergency'
@@ -26,6 +26,7 @@ LEAVE_TYPE = (
 )
 
 
+# Leave Model
 class Leave(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     startdate = models.DateField(verbose_name=_('Start Date'), help_text='leave start date is on ..', null=True,
@@ -68,17 +69,18 @@ class Leave(models.Model):
         dates = (test_date1 + timedelta(idx + 1)
                  for idx in range((test_date2 - test_date1).days))
 
-        # summing all weekdays
+        # summing all weekdays removing weekends
         res = sum(1 for day in dates if day.weekday() < 5)
 
         # holidayList
-        if startdate.month == 12:  # dec month
-            if startdate.day <= 25 or enddate.day >= 25:  # christmas
-                res = res - 1
+        holiday_list = [
+            (12, 25),  # Christmas
+            (1, 1)  # New Year
+        ]
 
-        if startdate.month == 1:  # Jan month
-            if startdate.day <= 1 or enddate.day >= 1:  # new year
-                res = res - 1
+        for month, day in holiday_list:
+            if (startdate.month == month and startdate.day <= day) or (enddate.month == month and enddate.day >= day):
+                res -= 1
 
         return res
 
@@ -106,11 +108,13 @@ class Leave(models.Model):
     def leave_approved(self):
         return self.is_approved == True
 
+    # leave approval, deduct leave, send notification
     def approve_leave(self, eObj):
         subject = 'Leave Approved'
-        message = f'Hi {eObj.firstname}, this is to notify that your leave got approved.'
+        message = f'Hi {eObj.firstname}, your leave got approved.'
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [eObj.email]
+
         send_mail(subject, message, email_from, recipient_list)
 
         Leave.date_of_approved_leave = self.created
@@ -140,13 +144,16 @@ class Leave(models.Model):
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [eObj.email]
         send_mail(subject, message, email_from, recipient_list)
-        if self.is_approved or not self.is_approved:
-            self.is_approved = False
-            self.status = 'rejected'
-            self.save()
 
-    @property
-    def is_rejected(self):
-        Leave.Tempdays = -Leave.Tempdays
-        print("Leave Tempdays", Leave.Tempdays)
-        return self.status == 'rejected'
+        if self.is_approved:
+            # If the leave is approved, it's being rejected after approval
+            # Increase the leave count as it's already been deducted when approved
+            if self.leavetype == 'Unpaid':
+                eObj.Unpaid += self.leave_days
+            else:
+                eObj.Paid += self.leave_days
+            eObj.save()
+
+            # Update status to 'rejected' regardless of whether the leave was approved or pending
+        self.status = 'rejected'
+        self.save()

@@ -4,16 +4,14 @@ from employee.models import Role, Department, Employee
 
 
 class EmployeeCreateForm(forms.ModelForm):
-    employeeid = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': 'Please enter 5 characters without RGL or slashes eg. A0025'}))
+    # employeeid = forms.CharField(
+    #     widget=forms.TextInput(attrs={'placeholder': 'Please enter 5 characters without RGL or slashes eg. A0025'}))
     user = forms.ModelChoiceField(queryset=User.objects.filter(employee=None), empty_label=None)
 
     class Meta:
         model = Employee
         exclude = ['created', 'updated']
         widgets = {
-            'bio': forms.Textarea(attrs={'cols': 5, 'rows': 5}),
-            'birthday': forms.DateInput(attrs={'type': 'date'}),
             'startdate': forms.DateInput(attrs={'type': 'date'})
         }
 
@@ -27,3 +25,4 @@ class EmployeeCreateForm(forms.ModelForm):
         if Employee.objects.filter(user=user).exists():
             raise forms.ValidationError("A user can only be assigned to one employee.")
         return cleaned_data
+

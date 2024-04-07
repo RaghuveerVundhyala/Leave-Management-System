@@ -92,16 +92,15 @@ class Employee(models.Model):
     firstname = models.CharField(_('Firstname'), max_length=125, null=False, blank=False)
     lastname = models.CharField(_('Lastname'), max_length=125, null=False, blank=False)
     othername = models.CharField(_('Othername (optional)'), max_length=125, null=True, blank=True)
-    birthday = models.DateField(_('Birthday'), blank=False, null=False)
+    # birthday = models.DateField(_('Date of Birth'), blank=False, null=False)
 
     department = models.ForeignKey(Department, verbose_name=_('Department'), on_delete=models.SET_NULL, null=True,
                                    default=None)
     role = models.ForeignKey(Role, verbose_name=_('Role'), on_delete=models.SET_NULL, null=True, default=None)
-    startdate = models.DateField(_('Employement Date'), help_text='date of employement', blank=False, null=True)
+    startdate = models.DateField(_('Employment Date'), help_text='date of employment', blank=False, null=True)
     employeetype = models.CharField(_('Employee Type'), max_length=15, default=FULL_TIME, choices=EMPLOYEETYPE,
                                     blank=False, null=True)
-    employeeid = models.CharField(_('Employee ID Number'), max_length=10, null=True, blank=True)
-    # dateissued = models.DateField(_('Date Issued'), help_text='date staff id was issued', blank=False, null=True)
+    # employeeid = models.CharField(_('Employee ID Number'), max_length=10, null=True, blank=True)
 
     Unpaid = models.PositiveIntegerField(verbose_name=_('Unpaid Leave'), default=5,
                                          null=True,
@@ -111,11 +110,6 @@ class Employee(models.Model):
                                        blank=True)
 
     email = models.CharField(_('Email'), max_length=50, null=False, blank=False)
-    # app related
-    # is_blocked = models.BooleanField(_('Is Blocked'), help_text='button to toggle employee block and unblock',
-    #                                  default=False)
-    # is_deleted = models.BooleanField(_('Is Deleted'), help_text='button to toggle employee deleted and undelete',
-    #                                  default=False)
 
     created = models.DateTimeField(verbose_name=_('Created'), auto_now_add=True, null=True)
     updated = models.DateTimeField(verbose_name=_('Updated'), auto_now=True, null=True)
@@ -166,10 +160,11 @@ class Employee(models.Model):
         added : March, 03 2019 - 11:08 PM
 
         """
-        get_id = self.employeeid  # grab employee_id number from submitted form field
-        data = code_format(get_id)
-        self.employeeid = data  # pass the new code to the employee_id as its orifinal or actual code
+        # get_id = self.employeeid
+        # # grab employee_id number from submitted form field
+        # # data = code_format(get_id)
+        # data = get_id
+        # self.employeeid = data  # pass the new code to the employee_id as its orifinal or actual code
         super().save(*args, **kwargs)  # call the parent save method
-        print(self.employeeid)
 
 

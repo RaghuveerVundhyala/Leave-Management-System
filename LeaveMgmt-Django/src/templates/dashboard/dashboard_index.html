@@ -1,9 +1,16 @@
 {% extends '_layout.html' %}
+{% load static %}
 
 {% block title %} {{ title }} {% endblock %}
 
 {% block stylesheet %}
-
+      body {
+        background-image: url("{% static 'peepcogs.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-color: #f8f9fa; /* Light Grayish Blue */
+backdrop-filter: blur(2px);
+    }
 
     .sec-box {
         height: 160px;
@@ -16,19 +23,21 @@
         transition: all 0.3s ease;
         border-radius: 10px;
         overflow: hidden;
+        background-color: #ffffff; /* White */
+backdrop-filter: blur(50px);
     }
 
     .sec-box a {
-        color: #fff;
+        color: #495057; /* Dark Grayish Blue */
         text-decoration: none;
     }
 
     .employee-box {
-        background: linear-gradient(to right, #f77062, #fe5196);
+        background-color: #dee2e6; /* Light Grayish Blue */
     }
 
     .leave-box {
-        background: linear-gradient(to right, #00c6ff, #0072ff);
+        background-color: #ced4da; /* Light Grayish Blue */
     }
 
     .sec-box:hover {
@@ -54,7 +63,6 @@
     }
 {% endblock %}
 
-<!-- CONTENTS -->
 {% block content %}
 <section class="content">
     <section class="container-fluid">

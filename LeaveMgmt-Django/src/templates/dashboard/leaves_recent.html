@@ -1,75 +1,131 @@
-
 {% extends '_layout.html' %}
+{% load static %} <!-- Add this line to load static files -->
+
 {% block title %} {{ title }} {% endblock %}
 
- {% block navheader %}
- 	{% include 'includes/navheader_employee_app.html' %}
- {% endblock %}
+{% block navheader %}
+    {% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
 
- {% block content %}
-        <section class="content">
-            <section class="container-fluid">
-            	   <section class="row">
-                        <section class="col col-sm-8 offset-sm-2">
+{% block content %}
+    <style>
+        body {
+            background-image: url("{% static 'peepcogs.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            backdrop-filter: blur(2px);
+        }
 
-                            {% if  messages %}
-                                    {% for message in messages %}
-                                     <div {% if message.tags %} class="{{ message.tags}}"{% endif %}>
-                                         {{ message }}
-                                         <button type="button" class="close" id = "override-start"data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
-                                         </button>
-                                     </div>
-                                    {% endfor %}
-                            {% endif %}
+        .content {
+            padding: 20px;
+        }
 
-                        </section>
-                    </section>
+        .table-shadow {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
 
-                	<!-- TABLE -->
-                	<div class="table-responsive table-shadow">
-                		<div class="text-center table-description">
-                			<h4 class="title-h3" style="text-shadow: 1px 0px rgba(0,0,0,0.11)">Pending Leaves</h4>
-                		</div>
-                	
-                		<table class="table">
-							  <thead>
-							    <tr>
-							      <!-- <th scope="col">#</th> -->
-							      <th scope="col"><b>User</b></th>
-							      <th scope="col"><b>Type</b></th>
-							      <th scope="col"><b>Day(s)</b></th>
-							      <th scope="col"><b>Status</b></th>
-							      <th scope="col"><b>Actions</b></th>
-							    </tr>
-							  </thead>
-							  <tbody>
-							  	{% for leave in leave_list %}
-							    <tr>
+        .table-description {
+            margin-bottom: 20px;
+        }
 
-							      <td>{{ leave.user }}</td>
-							      <td>{{ leave.leavetype}}</td>
-							      <td>{{ leave.leave_days }}</td>
-							      <td><span class="badge badge-success" style="background-color:rgb(189, 138, 0); font-size: 14px;">{{ leave.status }}</span></td>
+        .table-description h4 {
+            margin: 0;
+            text-shadow: 1px 0px rgba(0, 0, 0, 0.11);
+        }
 
-							      <td> 
-							      	<a href="{% url 'dashboard:userleaveview' leave.id %}" style="color: #795548;">
-							      	    <span>View</span>
-							      	</a>
-							      	
-							      </td>
-							    </tr>
+        .title-h3 {
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-							    {% endfor %}
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-							  </tbody>
+        .table th,
+        .table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
 
-						</table>
-			
-					</div>
-                	<!-- /TABLE -->
+        .table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
 
-            </section> <!-- /container --> 
+        .table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
 
+        .badge {
+            padding: 6px 12px;
+            font-size: 14px;
+            border-radius: 20px;
+        }
 
-        </section>
- {% endblock %}
+        .badge-success {
+            background-color: rgb(189, 138, 0);
+            color: #fff;
+        }
+    </style>
+
+    <section class="content">
+        <section class="container-fluid">
+            <section class="row">
+                <section class="col col-sm-8 offset-sm-2">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div {% if message.tags %} class="{{ message.tags}}" {% endif %}>
+                                {{ message }}
+                                <button type="button" class="close" id="override-start" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </section>
+            </section>
+
+            <!-- TABLE -->
+            <div class="table-responsive table-shadow">
+                <div class="text-center table-description">
+                    <h4 class="title-h3">Pending Leaves</h4>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col"><b>User</b></th>
+                            <th scope="col"><b>Type</b></th>
+                            <th scope="col"><b>Day(s)</b></th>
+                            <th scope="col"><b>Status</b></th>
+                            <th scope="col"><b>Actions</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leave in leave_list %}
+                        <tr>
+                            <td>{{ leave.user }}</td>
+                            <td>{{ leave.leavetype}}</td>
+                            <td>{{ leave.leave_days }}</td>
+                            <td><span class="badge badge-success">{{ leave.status }}</span></td>
+                            <td>
+                                <a href="{% url 'dashboard:userleaveview' leave.id %}" style="color: #795548;">
+                                    <span>View</span>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- /TABLE -->
+
+        </section> <!-- /container -->
+    </section>
+{% endblock %}
