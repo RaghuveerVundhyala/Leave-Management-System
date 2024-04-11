@@ -1,107 +1,79 @@
-
 {% extends '_layout.html' %}
 
-{% block title %} {{ title }} {% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% load crispy_forms_tags %}
 
- {% block navheader %}
+{% block navheader %}
     {% include 'includes/navheader_employee_app.html' %}
- {% endblock %}
+{% endblock %}
 
- {% block stylesheet %}
-    .form-wrapper{
+{% block stylesheet %}
+<style>
+    .form-wrapper {
         -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
         box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
         padding: 2%;
-        background:#fff !important;
-        padding-bottom:5%;
+        background: #fff !important;
+        padding-bottom: 5%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="content">
+    <section class="container-fluid">
+        <section class="form-wrapper">
+            <!-- Form content -->
+            <form id="userForm" action="" method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="button" id="submitButton" class="btn btn-primary btn-lg btn-block">Submit</button>
+            </form>
+        </section>
+    </section>
+</section>
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('userForm');
+    var inputs = form.querySelectorAll('input[type=text], input[type=password], input[type=email], select');
+    var submitButton = document.getElementById('submitButton');
+
+    // Initially disable all fields except the first
+    for (var i = 1; i < inputs.length; i++) {
+        inputs[i].disabled = true;
     }
 
+    // Function to enable the next input field
+    function enableNextInput(currentInput) {
+        var nextInput = currentInput.nextElementSibling;
+        while(nextInput) {
+            if (nextInput.tagName === "INPUT" || nextInput.tagName === "SELECT") {
+                nextInput.disabled = false;
+                nextInput.focus();
+                break;
+            }
+            nextInput = nextInput.nextElementSibling;
+        }
+    }
 
-
-
- #override-start{
-    background:none !important;
-    top: 35% !important;
-    right:13px;
-    color:#000;
-    font-size: 24px;
-
-}
-
-.alert-warning{
-    background:#fd7b7b;
-}
-
-.alert-success {
-    background-color: #82b72a;
-}
-
-.alert-success,.alert-warning{
-    font-size:16px;
-}
-
- {% endblock %}
-
- {% block content %}
-        <section class="content">
-            <section class="container-fluid">
-           
-                <section class="form-wrapper">
-                    <section class="row">
-                        <section class="col col-sm-8 offset-sm-2">
-
-                            {% if  messages %}
-                                    {% for message in messages %}
-                                     <div {% if message.tags %} class="{{ message.tags}}"{% endif %}>
-                                         {{ message }}
-                                         <button type="button" class="close" id = "override-start"data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
-                                         </button>
-                                     </div>
-                                    {% endfor %}
-                            {% endif %}
-
-                        </section>
-                    </section>
-                    <section class="row">
-                        <section class="col-lg-12 col-md-12 col-sm-12 text-center">
-                            <h3 class="title-h3">Add User</h3>
-                            <p>A user must be created before adding an "Employee" to the system: So that you can select user acc while adding employees</p>
-                        </section>
-                    </section>
-
-                    <section class="row">
-                        <section class="col-lg-12 col-md-12 col-sm-12">
-                            <form action="" method="POST">
-                                {% csrf_token %}
-                                {{form | crispy }}
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
-                            </form>
-                        </section>
-
-                    </section>
-
-                </section>
-
-            </section> <!-- /container --> 
-        </section>
- {% endblock %}
-
-<script type="text/javascript">
-{% block extrajs%}
-/*create-user-button - handler*/
-
-// $(document).ready(function(){
-
-// var createuser = $('.create-user-model');
-// createuser.on('click',function(){
-// alert("who clicked me ?")
-
-// });
-
-
-// });
-
-{% endblock %}
+    // Add change event listener to each input
+    inputs.forEach(function(input, index) {
+        input.addEventListener('change', function() {
+            if (input.value.trim() !== '') {
+                if (index < inputs.length - 1) {
+                    enableNextInput(input);
+                } else {
+                    submitButton.disabled = false;
+                }
+            } else {
+                submitButton.disabled = true;
+            }
+        });
+    });
+});
 </script>
+{% endblock %}

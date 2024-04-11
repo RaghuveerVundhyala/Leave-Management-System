@@ -22,95 +22,105 @@ pastStatus = None
 
 # Function to compare dates
 def compare_dates(date1, date2):
-    """
-        Compare two dates.
-
-        Args:
-        date1 (datetime): First date.
-        date2 (datetime): Second date.
-
-        Returns:
-        bool: True if date1 is later than date2, False otherwise.
-        """
     flag = False
     if date1.date() > date2.date():
         flag = True
     elif date1.date() == date2.date():
         if date1.time() > date2.time():
             flag = True
-        else:
-            flag = False
-
     return flag
+
+
+SICK = 'sick'
+CASUAL = 'casual'
+EMERGENCY = 'emergency'
+OTHER = 'other'
 
 
 # Dashboard view function
 def dashboard(request):
-    global status
-    global date
-    global pastLeaveObj
-    global pastStatus
-    dataset = dict()
-    user = request.user
+    dataset = {}
+
     # Redirect to login page if user is not authenticated
     if not request.user.is_authenticated:
         return redirect('accounts:login')
 
-    employees = Employee.objects.all()
-    if request.user.username == "Raghuveer":
-        employees = Employee.objects.filter(department_id=3)
-        pass
-    if request.user.username == "Akhil":
-        employees = Employee.objects.filter(department_id=4)
-        pass
-    if request.user.username == "Vasu":
-        employees = Employee.objects.filter(department_id=2)
-        pass
-    leaves = Leave.objects.all_pending_leaves()
+    global pastLeaveObj
+    global pastStatus
+
+    user = request.user
+    department_id = None
+
+    # Determine department based on user
+    if user.username == "Raghuveer":
+        department_id = 3
+    elif user.username == "Akhil":
+        department_id = 4
+    elif user.username == "Vasu":
+        department_id = 2
+
+    # Filter employees based on department if applicable
+    if department_id:
+        employees = Employee.objects.filter(department_id=department_id)
+    else:
+        employees = Employee.objects.all()
+
+    # Filter leaves based on department if applicable
+    if department_id:
+        leaves = Leave.objects.all_pending_leaves().filter(user__employee__department_id=department_id)
+    else:
+        leaves = Leave.objects.all_pending_leaves()
+
+    # Get staff leaves
     staff_leaves = Leave.objects.filter(user=user)
 
-    dateupdated = datetime(2000, 1, 1, 0, 0, 0)
-    currLeaveObj = None
-    for leave in staff_leaves:
-        if compare_dates(leave.updated, dateupdated):
-            dateupdated = leave.updated
-            currLeaveObj = leave
+    # Find most recent leave
+    currLeaveObj = staff_leaves.order_by('-updated').first()
 
     try:
         e = Employee.objects.get(user=user)
-        exp = False
-        try:
-            if currLeaveObj == pastLeaveObj and currLeaveObj.status != pastLeaveObj.status:
-                exp = True
-        except:
-            pass
 
-        if currLeaveObj != pastLeaveObj or exp:
+        if currLeaveObj and pastLeaveObj and currLeaveObj != pastLeaveObj and currLeaveObj.status != pastLeaveObj.status:
+            if pastLeaveObj.status == "approved":
+                if pastLeaveObj.leavetype in [SICK, CASUAL, EMERGENCY, OTHER]:
+                    e.Paid += pastLeaveObj.leave_days
+                else:
+                    e.Unpaid += pastLeaveObj.leave_days
+            elif pastLeaveObj.status == "cancelled":
+                if pastLeaveObj.leavetype in [SICK, CASUAL, EMERGENCY, OTHER]:
+                    e.Paid -= pastLeaveObj.leave_days
+                else:
+                    e.Unpaid -= pastLeaveObj.leave_days
+
+        if currLeaveObj != pastLeaveObj or (currLeaveObj and currLeaveObj.status != pastStatus):
             pastLeaveObj = copy(currLeaveObj)
-            pastStatus = pastLeaveObj.status
+            pastStatus = currLeaveObj.status
+
             if currLeaveObj.status == "approved":
-                if currLeaveObj.leavetype == 'Unpaid':
-                    e.Unpaid = e.Unpaid - currLeaveObj.leave_days
+                if currLeaveObj.leavetype in [SICK, CASUAL, EMERGENCY, OTHER]:
+                    e.Paid -= currLeaveObj.leave_days
                 else:
-                    e.Paid = e.Paid - currLeaveObj.leave_days
+                    e.Unpaid -= currLeaveObj.leave_days
             elif currLeaveObj.status == "cancelled":
-                if currLeaveObj.leavetype == 'Unpaid':
-                    e.Unpaid = e.Unpaid + currLeaveObj.leave_days
+                if currLeaveObj.leavetype in [SICK, CASUAL, EMERGENCY, OTHER]:
+                    e.Paid += currLeaveObj.leave_days
                 else:
-                    e.Paid = e.Paid + currLeaveObj.leave_days
-            e.save()
+                    e.Unpaid += currLeaveObj.leave_days
+
+        e.save()
 
         print("dashboard/views", e.Paid, e.Unpaid)
         dataset['remLeavePaid'] = e.Paid
         dataset['remLeaveUnpaid'] = e.Unpaid
+
+
+
     except Employee.DoesNotExist:
         pass
+
     dataset['employees'] = employees
-
     dataset['leaves'] = leaves
-
     dataset['staff_leaves'] = staff_leaves
-
     dataset['title'] = 'summary'
 
     return render(request, 'dashboard/dashboard_index.html', dataset)
@@ -121,7 +131,7 @@ def dashboard_employees(request):
         return redirect('/')
 
     dataset = dict()
-    departments = Department.objects.all()
+    # departments = Department.objects.all()
     # employees = Employee.objects.all()
 
     if request.user.username == "Raghuveer":
@@ -276,14 +286,32 @@ def leave_creation(request):
 def leaves_list(request):
     if not request.user.is_superuser:
         return redirect('/')
-    leaves = Leave.objects.all_pending_leaves()
+    department_id = None
+    if request.user.username == "Raghuveer":
+        department_id = 3
+    elif request.user.username == "Akhil":
+        department_id = 4
+    elif request.user.username == "Vasu":
+        department_id = 2
+    if department_id:
+        leaves = Leave.objects.all_pending_leaves().filter(user__employee__department_id=department_id)
+    # leaves = Leave.objects.all_pending_leaves()
     return render(request, 'dashboard/leaves_recent.html', {'leave_list': leaves, 'title': 'leaves list - pending'})
 
 
 def leaves_approved_list(request):
     if not request.user.is_superuser:
         return redirect('/')
-    leaves = Leave.objects.all_approved_leaves()  # approved leaves -> calling model manager method
+    department_id = None
+    if request.user.username == "Raghuveer":
+        department_id = 3
+    elif request.user.username == "Akhil":
+        department_id = 4
+    elif request.user.username == "Vasu":
+        department_id = 2
+    if department_id:
+        leaves = Leave.objects.all_approved_leaves().filter(user__employee__department_id=department_id)
+    # leaves = Leave.objects.all_approved_leaves()  # approved leaves -> calling model manager method
     return render(request, 'dashboard/leaves_approved.html', {'leave_list': leaves, 'title': 'approved leave list'})
 
 
@@ -320,7 +348,16 @@ def approve_leave(request, id):
 def cancel_leaves_list(request):
     if not (request.user.is_superuser and request.user.is_authenticated):
         return redirect('/')
-    leaves = Leave.objects.all_cancel_leaves()
+    department_id = None
+    if request.user.username == "Raghuveer":
+        department_id = 3
+    elif request.user.username == "Akhil":
+        department_id = 4
+    elif request.user.username == "Vasu":
+        department_id = 2
+    if department_id:
+        leaves = Leave.objects.all_cancel_leaves().filter(user__employee__department_id=department_id)
+    # leaves = Leave.objects.all_cancel_leaves()
     return render(request, 'dashboard/leaves_cancel.html', {'leave_list_cancel': leaves, 'title': 'Cancel leave list'})
 
 
@@ -357,7 +394,16 @@ def uncancel_leave(request, id):
 
 def leave_rejected_list(request):
     dataset = dict()
-    leave = Leave.objects.all_rejected_leaves()
+    department_id = None
+    if request.user.username == "Raghuveer":
+        department_id = 3
+    elif request.user.username == "Akhil":
+        department_id = 4
+    elif request.user.username == "Vasu":
+        department_id = 2
+    if department_id:
+        leave = Leave.objects.all_rejected_leaves().filter(user__employee__department_id=department_id)
+    # leave = Leave.objects.all_rejected_leaves()
 
     dataset['leave_list_rejected'] = leave
     return render(request, 'dashboard/rejected_leaves_list.html', dataset)
@@ -371,13 +417,11 @@ def reject_leave(request, id):
     # Check if the leave is approved or pending
     if leave.status == 'approved':
         # For approved leave getting rejected, increment leave count
-        print("approve")
         if leave.leavetype == 'Unpaid':
             e.Unpaid += leave.leave_days
         else:
             e.Paid += leave.leave_days
     elif leave.status == 'pending':
-        print("rej loop",e.Paid)
         pass
     else:
         # For other cases, do nothing
@@ -388,9 +432,6 @@ def reject_leave(request, id):
 
     messages.success(request, 'Leave is rejected', extra_tags='alert alert-success alert-dismissible show')
     return redirect('dashboard:leavesrejected')
-
-
-
 
 
 def unreject_leave(request, id):

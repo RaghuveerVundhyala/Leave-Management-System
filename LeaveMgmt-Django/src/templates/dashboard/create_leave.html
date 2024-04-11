@@ -1,144 +1,223 @@
-
 {% extends '_layout.html' %}
 
 {% block title %} {{ title }} {% endblock %}
 
 {% load crispy_forms_tags %}
 
- {% block navheader %}
-    {% include 'includes/navheader_employee_app.html' %}
- {% endblock %}
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
 
 
+{% block stylesheet %}
 
-  {% block stylesheet %}
+#override-start{
+background:none !important;
+top: 35% !important;
+right:13px;
+color:#000;
+font-size: 24px;
 
-   #override-start{
-    background:none !important;
-    top: 35% !important;
-    right:13px;
-    color:#000;
-    font-size: 24px;
-
-    }
-
-    .alert-warning{
-        background:#fd7b7b;
-    }
-
-    .alert-success {
-        background-color: #82b72a;
-    }
-
-    .alert-success,.alert-warning{
-        font-size:16px;
-    }
-
-
-
-       .sec{
-       border:1px solid yellow;
-       background:red;
-    }
-
-        .form-wrapper{
-        -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
-        box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
-        padding: 2%;
-        background:#fff !important;
-        padding-bottom:5%;
-    }
-
-        .btn-lg{
-        padding:8px 30px;
-
-    }
-
-
-    .main-panel > .content {
-    padding: 60px 15px;
-    min-height: calc(100% - 123px);
-
-
-
-
-  {% endblock %}
-
-
-
-
- {% block content %}
-        <section class="content">
-            <section class="container-fluid">
-                <section class="form-wrapper">
-                    <section class="row">
-                        <section class="col col-lg-12 col-md-12  col-sm-12">
-                            {% if  messages %}
-                                    {% for message in messages %}
-                                     <div {% if message.tags %} class="{{ message.tags}}"{% endif %}>
-                                         {{ message }}
-                                         <button type="button" class="close" id = "override-start"data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
-                                         </button>
-                                     </div>
-                                    {% endfor %}
-                            {% endif %}
-
-                        </section>
-                    </section>
-
-                    <section class="row">
-                        <section class="col-lg-12 col-md-12 col-sm-12 text-center space-margin">
-                            <h3 class="title-h3">{{ title}}</h3>
-                        </section>
-
-                    </section>
-
-                    <section class="row">
-                        <section class="col-lg-12 col-md-12 col-sm-12">
-                            <form action="{% url 'dashboard:createleave' %}" method="POST">
-                                {% csrf_token %}
-                                {{ form | crispy}}
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">Request Leave</button>
-                            </form>
-                        </section>
-
-                    </section>
-
-
-                    <!DOCTYPE html>
-
-<style>
-table, th, td {
-  border:1px solid black;
 }
-</style>
-                    <h1><u>Public Holidays</u></h1>
 
-<table style="width:50%">
-  <tr>
-    <th>Date</th>
-    <th>Name</th>
-    <th>Number of Days</th>
-  </tr>
-  <tr>
-    <td>Jan, 01</td>
-    <td>New Year</td>
-    <td>1</td>
-  </tr>
-    <tr>
-    <td>Dec, 25</td>
-    <td>Chritmas Eve</td>
-    <td>1</td>
-  </tr>
-</table></section>
+.alert-warning{
+background:#fd7b7b;
+}
 
-            </section> <!-- /container -->
-        </section>
- {% endblock %}
+.alert-success {
+background-color: #82b72a;
+}
 
-<script type="text/javascript">
-{% block extrajs%}
+.alert-success,.alert-warning{
+font-size:16px;
+}
+
+
+.sec{
+border:1px solid yellow;
+background:red;
+}
+
+.form-wrapper{
+-webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+padding: 2%;
+background:#fff !important;
+padding-bottom:5%;
+}
+
+.btn-lg{
+padding:8px 30px;
+
+}
+
+
+.main-panel > .content {
+padding: 60px 15px;
+min-height: calc(100% - 123px);
 
 
 {% endblock %}
+
+
+{% block content %}
+<section class="content">
+    <section class="container-fluid">
+        <section class="form-wrapper">
+            <section class="row">
+                <section class="col col-lg-12 col-md-12  col-sm-12">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div {% if message.tags %} class="{{ message.tags}}" {% endif %}>
+                        {{ message }}
+                        <button type="button" class="close" id="override-start" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                </section>
+            </section>
+
+            <section class="row">
+                <section class="col-lg-12 col-md-12 col-sm-12 text-center space-margin">
+                    <h3 class="title-h3">{{ title}}</h3>
+                </section>
+
+            </section>
+
+            <section class="row">
+                <section class="col-lg-12 col-md-12 col-sm-12">
+
+                    <form action="{% url 'dashboard:createleave' %}" method="POST" id="leaveForm">
+        {% csrf_token %}
+        {{ form|crispy }}
+
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                var startDateInput = document.getElementsByName('startdate')[0];
+                var endDateInput = document.getElementsByName('enddate')[0];
+                var leaveTypeInput = document.getElementsByName('leavetype')[0]; // Adjust the name as per your form
+                var reasonInput = document.getElementsByName('reason')[0]; // Adjust the name as per your form
+
+                // Initially disable the fields except for start date
+                endDateInput.disabled = true;
+                leaveTypeInput.disabled = true;
+                reasonInput.disabled = true;
+
+                function enableNextField(field) {
+                    field.disabled = false;
+                    field.focus(); // Focus on next field for user convenience
+                }
+
+                function validateStartDate() {
+                    var startDate = new Date(startDateInput.value);
+                    var today = new Date();
+
+                    if (startDate >= today) {
+                        enableNextField(endDateInput);
+                    } else {
+                        alert('Start date cannot be in the past.');
+                        endDateInput.disabled = true;
+                    }
+                }
+
+                function validateEndDate() {
+                    var startDate = new Date(startDateInput.value);
+                    var endDate = new Date(endDateInput.value);
+
+
+                    if (endDate > startDate) {
+                        enableNextField(leaveTypeInput);
+                        enableNextField(reasonInput);
+                    }
+
+                    else {
+                        alert('Both dates should not be on same date and End date cannot be before start date.');
+                        leaveTypeInput.disabled = true;
+                    }
+                }
+
+                startDateInput.addEventListener('change', validateStartDate);
+                endDateInput.addEventListener('change', validateEndDate);
+
+                // Optionally, for leaveType, you might want to add similar validation before enabling the reason field
+                leaveTypeInput.addEventListener('change', function() {
+                    if (leaveTypeInput.value) { // Assuming value is required to enable the next field
+
+                    }
+                });
+            });
+        </script>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-block">Request Leave</button>
+    </form>
+
+
+                </section>
+
+            </section>
+
+
+            <!DOCTYPE html>
+
+            <style>
+table, th, td {
+  border:1px solid black;
+}
+
+
+            </style>
+            <h1><u>Public Holidays</u></h1>
+
+            <table style="width:50%">
+                <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Number of Days</th>
+                </tr>
+                <tr>
+                    <td>Jan, 01</td>
+                    <td>New Year</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Dec, 25</td>
+                    <td>Chritmas Eve</td>
+                    <td>1</td>
+                </tr>
+            </table>
+        </section>
+
+    </section> <!-- /container -->
+</section>
+{% endblock %}
+
+<script type="text/javascript">
+    {% block extrajs %}
+
+    function validateStartDate() {
+        var startDateInput = document.getElementById('startdate');
+        var endDateInput = document.getElementById('enddate');
+        var startDate = new Date(startDateInput.value);
+        var today = new Date();
+
+        // Reset end date input when start date changes
+        endDateInput.value = '';
+        endDateInput.disabled = true;
+
+        // Ensure start date is not in the past
+        if (startDate >= today) {
+            endDateInput.disabled = false; // Enable the end date input
+        } else {
+            alert('Start date cannot be in the past.');
+        }
+    }
+
+    {% endblock %}
+
+
 </script>
+
+
