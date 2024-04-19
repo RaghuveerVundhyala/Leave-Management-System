@@ -3,81 +3,21 @@
 {% block title %} {{ title }} {% endblock %}
 
 {% load static %}
-
 {% load crispy_forms_tags %}
 
 {% block navheader %}
 {% include 'includes/navheader_employee_app.html' %}
 {% endblock %}
 
-
 {% block stylesheet %}
-
-.sec{
-border:1px solid yellow;
-background:red;
-}
-
-.form-wrapper{
--webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
-padding: 2%;
-background:#fff !important;
-padding-bottom:5%;
-}
-
-.btn-lg{
-padding:8px 30px;
-
-}
-
-
-.main-panel > .content {
-padding: 60px 15px;
-min-height: calc(100% - 123px);
-}
-
-
-#override-start{
-background:none !important;
-top: 35% !important;
-right:13px;
-color:#000;
-font-size: 24px;
-
-}
-
-.alert-warning{
-background:#fd7b7b;
-}
-
-.alert-success {
-background-color: #82b72a;
-}
-
-.alert-success,.alert-warning{
-font-size:16px;
-}
-
-.prev-holder .prev-avatar{
-border-radius:50%;
-width:250px;
-height:250px;
-
--webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5prgba(0,0,0,0.2);
-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
-}
-
-
+<!-- Add any custom styles here -->
 {% endblock %}
-
 
 {% block content %}
 <section class="content">
     <section class="container-fluid">
         <section class="row">
             <section class="col col-sm-8 offset-sm-2">
-
                 {% if messages %}
                 {% for message in messages %}
                 <div {% if message.tags %} class="{{ message.tags}}" {% endif %}>
@@ -88,12 +28,10 @@ box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px
                 </div>
                 {% endfor %}
                 {% endif %}
-
             </section>
         </section>
 
         <section class="form-wrapper">
-
             <section class="row">
                 <section class="col-lg-12 col-md-12 col-sm-12 text-center">
                     <h3 class="title-h3">Add Employee</h3>
@@ -102,23 +40,122 @@ box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px
 
             <section class="row">
                 <section class="col-lg-8 col-md-12 col-sm-12">
-                    <form action="" method="POST" enctype="multipart/form-data">
+                    <form action="" method="POST" enctype="multipart/form-data" id="addEmployeeForm">
                         {% csrf_token %}
-                        {{form | crispy}}
+                        {{ form | crispy }}
+
+                        <!-- JavaScript validation for first name, last name, other name, email, and employment start date -->
+                        <script type="text/javascript">
+                            document.addEventListener('DOMContentLoaded', function() {
+                                var firstNameInput = document.getElementById('id_firstname');
+                                var lastNameInput = document.getElementById('id_lastname');
+                                var otherNameInput = document.getElementById('id_othername');
+                                var emailInput = document.getElementById('id_email');
+                                var employmentStartDateInput = document.getElementById('id_startdate');
+                                var submitButton = document.querySelector('button[type="submit"]');
+                                var errorMessage = document.getElementById('errorMessage');
+
+                                // Function to validate name fields
+                                function validateName(inputElement, fieldName) {
+                                    var inputValue = inputElement.value.trim();
+                                    if (!/^[a-zA-Z\s]*$/.test(inputValue)) {
+                                        // Display error message
+                                        alert(fieldName + ' can only contain alphabets and spaces.');
+                                        return false;
+                                    }
+                                    return true;
+                                }
+
+                                // Function to validate email
+                                function validateEmail(inputElement) {
+                                    var emailValue = inputElement.value.trim();
+                                    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                    if (!emailRegex.test(emailValue)) {
+                                        // Display error message
+                                        alert('Please enter a valid email address.');
+                                        return false;
+                                    }
+                                    return true;
+                                }
+
+                                // Function to validate employment start date
+                                function validateEmploymentStartDate(inputElement) {
+                                    var employmentStartDate = new Date(inputElement.value.trim());
+                                    var januaryFirst2024 = new Date('2024-01-01');
+                                    if (employmentStartDate <= januaryFirst2024) {
+                                        // Display error message
+                                        alert('Employment start date must be after January 1st, 2024.');
+                                        return false;
+                                    }
+                                    return true;
+                                }
+
+                                // Event listener for first name input
+                                firstNameInput.addEventListener('blur', function() {
+                                    validateName(firstNameInput, 'First name');
+                                });
+
+                                // Event listener for last name input
+                                lastNameInput.addEventListener('blur', function() {
+                                    validateName(lastNameInput, 'Last name');
+                                });
+
+                                // Event listener for other name input
+                                otherNameInput.addEventListener('blur', function() {
+                                    validateName(otherNameInput, 'Other name');
+                                });
+
+                                // Event listener for email input
+                                emailInput.addEventListener('blur', function() {
+    validateEmail(emailInput);
+    var emailValue = emailInput.value.trim();
+    if (emailValue !== '') {
+        fetch('/dashboard/check_email/?email=' + encodeURIComponent(emailValue))
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    document.getElementById('emailErrorMessage').textContent = 'Email already taken.';
+                } else {
+                    document.getElementById('emailErrorMessage').textContent = ''; // Clear error message
+                }
+            })
+            .catch(error => {
+                console.error('Error checking email:', error);
+            });
+    }
+});
+                                // Event listener for employment start date input
+                                employmentStartDateInput.addEventListener('blur', function() {
+                                    validateEmploymentStartDate(employmentStartDateInput);
+                                });
+
+                                // Event listener for form submission
+                                submitButton.addEventListener('click', function(event) {
+                                    if (!validateName(firstNameInput, 'First name') ||
+                                        !validateName(lastNameInput, 'Last name') ||
+                                        !validateName(otherNameInput, 'Other name') ||
+                                        !validateEmail(emailInput) ||
+                                        !validateEmploymentStartDate(employmentStartDateInput)) {
+                                        event.preventDefault(); // Prevent form submission if validation fails
+                                    }
+                                });
+                            });
+
+                        </script>
+                        <!-- End of JavaScript validation -->
+
+                        <p id="emailErrorMessage" style="color: red;"></p>
+
                         <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
+
                     </form>
                 </section>
 
                 <section class="col-lg-4 col-md-12 col-sm-12 text-center">
-
-
+                    <!-- Additional content -->
                 </section>
-
             </section>
-
         </section>
-
     </section> <!-- /container -->
 </section>
 {% endblock %}
-

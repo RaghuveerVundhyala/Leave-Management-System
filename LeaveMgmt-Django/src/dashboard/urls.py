@@ -22,6 +22,7 @@ urlpatterns = [
     path('leaves/rejected/all/', views.leave_rejected_list, name='leavesrejected'),
     path('leave/reject/<int:id>/', views.reject_leave, name='reject'),
     path('leave/unreject/<int:id>/', views.unreject_leave, name='unreject'),
+    path('check_email/', views.check_email, name='check_email'),
 
 
 ]

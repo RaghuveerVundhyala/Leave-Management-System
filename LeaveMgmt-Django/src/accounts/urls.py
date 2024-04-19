@@ -22,4 +22,6 @@ urlpatterns = [
 
     # URL patterns for listing all users
     path('users/all', views.users_list, name='users'),
+
+    path('check_username/', views.check_username, name='check_username'),
 ]

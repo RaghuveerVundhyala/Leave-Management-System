@@ -5,7 +5,7 @@
 {% load crispy_forms_tags %}
 
 {% block navheader %}
-    {% include 'includes/navheader_employee_app.html' %}
+{% include 'includes/navheader_employee_app.html' %}
 {% endblock %}
 
 {% block stylesheet %}
@@ -23,57 +23,141 @@
 {% block content %}
 <section class="content">
     <section class="container-fluid">
+        <section class="row">
+        <section class="col col-sm-12">
+                  {% if  messages %}
+                                    {% for message in messages %}
+                                     <div {% if message.tags %} class="{{ message.tags}}"{% endif %}>
+                                         {{ message }}
+                                         <button type="button" class="close" id = "override-start"data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
+                                         </button>
+                                     </div>
+                      {% endfor %}
+                  {% endif %}
+        </section>
+      </section>
         <section class="form-wrapper">
             <!-- Form content -->
             <form id="userForm" action="" method="POST">
                 {% csrf_token %}
+                <p id="errorMessage" style="color: red;"></p>
                 {{ form|crispy }}
+
+         <script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('userForm');
+    var usernameInput = form.querySelector('input[name="username"]');
+    var emailInput = form.querySelector('input[name="email"]');
+    var password1Input = form.querySelector('input[name="password1"]');
+    var password2Input = form.querySelector('input[name="password2"]');
+    var submitButton = document.getElementById('submitButton');
+    var errorMessage = document.getElementById('errorMessage');
+
+    // Initially disable all inputs except username
+    emailInput.disabled = true;
+    password1Input.disabled = true;
+    password2Input.disabled = true;
+
+    // Form submission
+    submitButton.addEventListener('click', function() {
+        var isFormValid = form.checkValidity();
+        if (!isFormValid) {
+            alert('Please fill out all required fields correctly.');
+        } else {
+            form.submit();
+        }
+    });
+
+    // Password validator function
+    function validatePassword(password) {
+        // Check password length
+        if (password.length < 8) {
+            return "Your password must contain at least 8 characters.";
+        }
+        // Check if password contains username or email
+        if (password.includes(usernameInput.value) || password.includes(emailInput.value)) {
+            return "Your password can’t be too similar to your other personal information.";
+        }
+        // Check if password is a commonly used password
+        var commonPasswords = ["password", "123456", "qwerty"]; // Add more common passwords if needed
+        if (commonPasswords.includes(password.toLowerCase())) {
+            return "Your password can’t be a commonly used password.";
+        }
+        // Check if password is entirely numeric
+        if (!isNaN(password)) {
+            return "Your password can’t be entirely numeric.";
+        }
+        return ""; // Password is valid
+    }
+
+    // Validate username
+    usernameInput.addEventListener('blur', function() {
+        var username = usernameInput.value.trim();
+        var usernameRegex = /^[a-zA-Z][a-zA-Z0-9]*$/;
+        if (username === '') {
+            return; // Exit function without showing alert if username is empty
+        } else if (username.length > 150) {
+            alert('Username must be maximum 150 characters.');
+        } else if (!usernameRegex.test(username)) {
+            alert('Username must start with an alphabet and contain only alphanumeric characters.');
+        } else {
+            // Check if username already exists
+            fetch('/accounts/check_username/?username=' + encodeURIComponent(username))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        errorMessage.textContent = 'Username already taken.';
+                        // Disable email field if username is already taken
+                        emailInput.disabled = true;
+                    } else {
+                        errorMessage.textContent = ''; // Clear error message
+                        // Enable email field after username validation
+                        emailInput.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking username:', error);
+                });
+        }
+    });
+
+    // Validate email
+    emailInput.addEventListener('blur', function() {
+        var email = emailInput.value.trim();
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('Please enter a valid email address.');
+        } else {
+            // Enable password fields after email validation
+            password1Input.disabled = false;
+            password2Input.disabled = false;
+        }
+    });
+
+    // Validate password
+    password1Input.addEventListener('blur', function() {
+        var password = password1Input.value.trim();
+        var errorMessage = validatePassword(password);
+        if (errorMessage) {
+            alert(errorMessage);
+        }
+    });
+
+    // Validate password match
+    password2Input.addEventListener('blur', function() {
+        if (password2Input.value.trim() !== password1Input.value.trim()) {
+            alert('Passwords do not match.');
+        }
+    });
+});
+</script>
+
+
+
                 <button type="button" id="submitButton" class="btn btn-primary btn-lg btn-block">Submit</button>
+
             </form>
         </section>
     </section>
 </section>
-{% endblock %}
-
-{% block extrajs %}
-<script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    var form = document.getElementById('userForm');
-    var inputs = form.querySelectorAll('input[type=text], input[type=password], input[type=email], select');
-    var submitButton = document.getElementById('submitButton');
-
-    // Initially disable all fields except the first
-    for (var i = 1; i < inputs.length; i++) {
-        inputs[i].disabled = true;
-    }
-
-    // Function to enable the next input field
-    function enableNextInput(currentInput) {
-        var nextInput = currentInput.nextElementSibling;
-        while(nextInput) {
-            if (nextInput.tagName === "INPUT" || nextInput.tagName === "SELECT") {
-                nextInput.disabled = false;
-                nextInput.focus();
-                break;
-            }
-            nextInput = nextInput.nextElementSibling;
-        }
-    }
-
-    // Add change event listener to each input
-    inputs.forEach(function(input, index) {
-        input.addEventListener('change', function() {
-            if (input.value.trim() !== '') {
-                if (index < inputs.length - 1) {
-                    enableNextInput(input);
-                } else {
-                    submitButton.disabled = false;
-                }
-            } else {
-                submitButton.disabled = true;
-            }
-        });
-    });
-});
-</script>
 {% endblock %}

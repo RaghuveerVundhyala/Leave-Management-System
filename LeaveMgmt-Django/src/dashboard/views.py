@@ -1,6 +1,6 @@
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models import Q
@@ -199,7 +199,6 @@ def dashboard_employees_create(request):
     return render(request, 'dashboard/employee_create.html', dataset)
 
 
-# ---------------------LEAVE-------------------------------------------
 def compDays(startDate, endDate):
     date_format = '%Y-%m-%d'
 
@@ -459,3 +458,11 @@ def view_my_leave_table(request):
     else:
         return redirect('accounts:login')
     return render(request, 'dashboard/staff_leaves_table.html', dataset)
+
+
+def check_email(request):
+    email = request.GET.get('email', None)
+    data = {
+        'exists': Employee.objects.filter(email=email).exists()
+    }
+    return JsonResponse(data)

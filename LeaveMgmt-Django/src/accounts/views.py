@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -53,7 +54,7 @@ def register_user_view(request):
             return redirect('accounts:register')
         else:
             # Display error message and redirect to registration page
-            messages.error(request, 'Username or password is invalid',
+            messages.error(request, 'Username Already Taken(Please try again)',
                            extra_tags='alert alert-warning alert-dismissible show')
             return redirect('accounts:register')
 
@@ -114,3 +115,11 @@ def users_list(request):
         pass
     # employees = Employee.objects.all()
     return render(request, 'accounts/users_table.html', {'employees': employees, 'title': 'Employee List'})
+
+
+def check_username(request):
+    username = request.GET.get('username', None)
+    data = {
+        'exists': User.objects.filter(username=username).exists()
+    }
+    return JsonResponse(data)
