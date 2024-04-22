@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     emailInput.disabled = true;
     password1Input.disabled = true;
     password2Input.disabled = true;
+    submitButton.disabled = true;
 
     // Form submission
     submitButton.addEventListener('click', function() {
@@ -109,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         errorMessage.textContent = 'Username already taken.';
                         // Disable email field if username is already taken
                         emailInput.disabled = true;
+
                     } else {
                         errorMessage.textContent = ''; // Clear error message
                         // Enable email field after username validation
@@ -140,6 +142,9 @@ document.addEventListener('DOMContentLoaded', function() {
         var errorMessage = validatePassword(password);
         if (errorMessage) {
             alert(errorMessage);
+        }
+        else{
+        submitButton.disabled = false;
         }
     });
 

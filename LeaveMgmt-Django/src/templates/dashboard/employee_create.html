@@ -47,99 +47,119 @@
                         <!-- JavaScript validation for first name, last name, other name, email, and employment start date -->
                         <script type="text/javascript">
                             document.addEventListener('DOMContentLoaded', function() {
-                                var firstNameInput = document.getElementById('id_firstname');
-                                var lastNameInput = document.getElementById('id_lastname');
-                                var otherNameInput = document.getElementById('id_othername');
-                                var emailInput = document.getElementById('id_email');
-                                var employmentStartDateInput = document.getElementById('id_startdate');
-                                var submitButton = document.querySelector('button[type="submit"]');
-                                var errorMessage = document.getElementById('errorMessage');
+    var firstNameInput = document.getElementById('id_firstname');
+    var lastNameInput = document.getElementById('id_lastname');
+    var otherNameInput = document.getElementById('id_othername');
+    var emailInput = document.getElementById('id_email');
+    var employmentStartDateInput = document.getElementById('id_startdate');
+    var submitButton = document.querySelector('button[type="submit"]');
+    var errorMessage = document.getElementById('errorMessage');
 
-                                // Function to validate name fields
-                                function validateName(inputElement, fieldName) {
-                                    var inputValue = inputElement.value.trim();
-                                    if (!/^[a-zA-Z\s]*$/.test(inputValue)) {
-                                        // Display error message
-                                        alert(fieldName + ' can only contain alphabets and spaces.');
-                                        return false;
-                                    }
-                                    return true;
-                                }
-
-                                // Function to validate email
-                                function validateEmail(inputElement) {
-                                    var emailValue = inputElement.value.trim();
-                                    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                                    if (!emailRegex.test(emailValue)) {
-                                        // Display error message
-                                        alert('Please enter a valid email address.');
-                                        return false;
-                                    }
-                                    return true;
-                                }
-
-                                // Function to validate employment start date
-                                function validateEmploymentStartDate(inputElement) {
-                                    var employmentStartDate = new Date(inputElement.value.trim());
-                                    var januaryFirst2024 = new Date('2024-01-01');
-                                    if (employmentStartDate <= januaryFirst2024) {
-                                        // Display error message
-                                        alert('Employment start date must be after January 1st, 2024.');
-                                        return false;
-                                    }
-                                    return true;
-                                }
-
-                                // Event listener for first name input
-                                firstNameInput.addEventListener('blur', function() {
-                                    validateName(firstNameInput, 'First name');
-                                });
-
-                                // Event listener for last name input
-                                lastNameInput.addEventListener('blur', function() {
-                                    validateName(lastNameInput, 'Last name');
-                                });
-
-                                // Event listener for other name input
-                                otherNameInput.addEventListener('blur', function() {
-                                    validateName(otherNameInput, 'Other name');
-                                });
-
-                                // Event listener for email input
-                                emailInput.addEventListener('blur', function() {
-    validateEmail(emailInput);
-    var emailValue = emailInput.value.trim();
-    if (emailValue !== '') {
-        fetch('/dashboard/check_email/?email=' + encodeURIComponent(emailValue))
-            .then(response => response.json())
-            .then(data => {
-                if (data.exists) {
-                    document.getElementById('emailErrorMessage').textContent = 'Email already taken.';
-                } else {
-                    document.getElementById('emailErrorMessage').textContent = ''; // Clear error message
-                }
-            })
-            .catch(error => {
-                console.error('Error checking email:', error);
-            });
+    // Function to validate name fields
+    function validateName(inputElement, fieldName) {
+        var inputValue = inputElement.value.trim();
+        if (!/^[a-zA-Z\s]*$/.test(inputValue)) {
+            // Display error message
+            alert(fieldName + ' can only contain alphabets and spaces.');
+            return false;
+        }
+        return true;
     }
-});
-                                // Event listener for employment start date input
-                                employmentStartDateInput.addEventListener('blur', function() {
-                                    validateEmploymentStartDate(employmentStartDateInput);
-                                });
 
-                                // Event listener for form submission
-                                submitButton.addEventListener('click', function(event) {
-                                    if (!validateName(firstNameInput, 'First name') ||
-                                        !validateName(lastNameInput, 'Last name') ||
-                                        !validateName(otherNameInput, 'Other name') ||
-                                        !validateEmail(emailInput) ||
-                                        !validateEmploymentStartDate(employmentStartDateInput)) {
-                                        event.preventDefault(); // Prevent form submission if validation fails
-                                    }
-                                });
-                            });
+    // Function to validate email
+    function validateEmail(inputElement) {
+        var emailValue = inputElement.value.trim();
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailValue)) {
+            // Display error message
+            alert('Please enter a valid email address.');
+            return false;
+        }
+        return true;
+    }
+
+    // Function to validate employment start date
+    function validateEmploymentStartDate(inputElement) {
+        var employmentStartDate = new Date(inputElement.value.trim());
+        var januaryFirst2024 = new Date('2024-01-01');
+        if (employmentStartDate <= januaryFirst2024) {
+            // Display error message
+            alert('Employment start date must be after January 1st, 2024.');
+            return false;
+        }
+        return true;
+    }
+
+    // Event listener for first name input
+    firstNameInput.addEventListener('blur', function() {
+        validateName(firstNameInput, 'First name');
+        checkFormValidity();
+    });
+
+    // Event listener for last name input
+    lastNameInput.addEventListener('blur', function() {
+        validateName(lastNameInput, 'Last name');
+        checkFormValidity();
+    });
+
+    // Event listener for other name input
+    otherNameInput.addEventListener('blur', function() {
+        validateName(otherNameInput, 'Other name');
+        checkFormValidity();
+    });
+
+    // Event listener for email input
+    emailInput.addEventListener('blur', function() {
+        validateEmail(emailInput);
+        var emailValue = emailInput.value.trim();
+        if (emailValue !== '') {
+            fetch('/dashboard/check_email/?email=' + encodeURIComponent(emailValue))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        document.getElementById('emailErrorMessage').textContent = 'Email already taken.';
+                        submitButton.disabled = true; // Disable submit button if email is duplicate
+                    } else {
+                        document.getElementById('emailErrorMessage').textContent = ''; // Clear error message
+                        submitButton.disabled = false; // Enable submit button if email is not duplicate
+                    }
+                    checkFormValidity();
+                })
+                .catch(error => {
+                    console.error('Error checking email:', error);
+                });
+        }
+    });
+
+    // Event listener for employment start date input
+    employmentStartDateInput.addEventListener('blur', function() {
+        validateEmploymentStartDate(employmentStartDateInput);
+        checkFormValidity();
+    });
+
+    // Function to check form validity and disable/enable submit button
+    function checkFormValidity() {
+        if (firstNameInput.value.trim() === '' ||
+            lastNameInput.value.trim() === '' ||
+            emailInput.value.trim() === '' ||
+            employmentStartDateInput.value.trim() === '') {
+            submitButton.disabled = true; // Disable submit button if any required field is empty
+        } else {
+            submitButton.disabled = false; // Enable submit button if all required fields are filled
+        }
+    }
+
+    // Event listener for form submission
+    submitButton.addEventListener('click', function(event) {
+        if (document.getElementById('emailErrorMessage').textContent !== '') {
+            event.preventDefault(); // Prevent form submission if email is duplicate
+        }
+        if (submitButton.disabled) {
+            event.preventDefault(); // Prevent form submission if any required field is empty
+        }
+    });
+});
+
 
                         </script>
                         <!-- End of JavaScript validation -->

@@ -34,7 +34,7 @@ def compare_dates(date1, date2):
 SICK = 'sick'
 CASUAL = 'casual'
 EMERGENCY = 'emergency'
-OTHER = 'other'
+OTHER = 'Other'
 
 
 # Dashboard view function
@@ -92,7 +92,7 @@ def dashboard(request):
                 else:
                     e.Unpaid -= pastLeaveObj.leave_days
 
-        if currLeaveObj != pastLeaveObj or (currLeaveObj and currLeaveObj.status != pastStatus):
+        if currLeaveObj and (currLeaveObj != pastLeaveObj or currLeaveObj.status != pastStatus):
             pastLeaveObj = copy(currLeaveObj)
             pastStatus = currLeaveObj.status
 

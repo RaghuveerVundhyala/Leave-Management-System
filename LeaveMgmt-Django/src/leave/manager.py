@@ -27,3 +27,4 @@ class LeaveManager(models.Manager):
 
     def current_year_leaves(self):
         return super().get_queryset().filter(startdate__year=datetime.date.today().year)
+
