@@ -123,3 +123,4 @@ def check_username(request):
         'exists': User.objects.filter(username=username).exists()
     }
     return JsonResponse(data)
+

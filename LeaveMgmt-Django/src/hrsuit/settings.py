@@ -15,12 +15,13 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Email Settings
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp-mail.outlook.com'
 EMAIL_HOST_USER = 'leavenotify@outlook.com'  # test
 EMAIL_HOST_PASSWORD = 'leavenotification00@0224'  # test
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'leavenotify@outlook.com'
 
 # Application definition
 
@@ -145,3 +146,4 @@ GRAPH_MODELS = {
     'all_applications': True,
     'graph_models': True,
 }
+PASSWORD_RESET_TIMEOUT_DAYS = 1
