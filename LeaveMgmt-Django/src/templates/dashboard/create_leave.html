@@ -64,6 +64,7 @@ min-height: calc(100% - 123px);
 <section class="content">
     <section class="container-fluid">
         <section class="form-wrapper">
+
             <section class="row">
                 <section class="col col-lg-12 col-md-12  col-sm-12">
                     {% if messages %}
@@ -100,12 +101,12 @@ min-height: calc(100% - 123px);
                                 var endDateInput = document.getElementsByName('enddate')[0];
                                 var leaveTypeInput = document.getElementsByName('leavetype')[0]; // Adjust the name as per your form
                                 var reasonInput = document.getElementsByName('reason')[0]; // Adjust the name as per your form
-
+                                var submitButton = document.querySelector('button[type="submit"]');
                                 // Initially disable the fields except for start date
                                 endDateInput.disabled = true;
                                 leaveTypeInput.disabled = true;
                                 reasonInput.disabled = true;
-
+submitButton.disabled = true;
                                 function enableNextField(field) {
                                     field.disabled = false;
                                     field.focus(); // Focus on next field for user convenience
@@ -152,7 +153,13 @@ min-height: calc(100% - 123px);
                                         if (endDate > startDate) {
                                             enableNextField(leaveTypeInput);
                                             enableNextField(reasonInput);
-                                        } else {
+                                        }
+                                        else if (endDate = startDate){
+                                            alert('End date and start date cannot be same');
+                                            leaveTypeInput.disabled = true;
+                                            reasonInput.disabled = true;
+                                        }
+                                        else {
                                             alert('End date cannot be before start date.');
                                             leaveTypeInput.disabled = true;
                                             reasonInput.disabled = true;
@@ -163,7 +170,7 @@ min-height: calc(100% - 123px);
                                 }
 
                                 endDateInput.addEventListener('blur', validateEndDate);
-
+enableNextField(submitButton);
                                 // Optionally, for leaveType, you might want to add similar validation before enabling the reason field
                                 leaveTypeInput.addEventListener('change', function() {
                                     if (leaveTypeInput.value) { // Assuming value is required to enable the next field
@@ -198,8 +205,8 @@ min-height: calc(100% - 123px);
                     <th>Number of Days</th>
                 </tr>
                 <tr>
-                    <td>Jan, 01</td>
-                    <td>New Year</td>
+                    <td>Jul, 04</td>
+                    <td>Independence day</td>
                     <td>1</td>
                 </tr>
                 <tr>
@@ -213,66 +220,3 @@ min-height: calc(100% - 123px);
     </section> <!-- /container -->
 </section>
 {% endblock %}
-
-<script type="text/javascript">
-    {% block extrajs %}
-
-    function validateStartDate() {
-        var startDateInput = document.getElementsByName('startdate')[0];
-        var endDateInput = document.getElementsByName('enddate')[0];
-        var leaveTypeInput = document.getElementsByName('leavetype')[0];
-        var reasonInput = document.getElementsByName('reason')[0];
-        var startDate = startDateInput.value;
-        var endDate = endDateInput.value;
-
-        // Reset end date input when start date changes
-        endDateInput.value = '';
-        endDateInput.disabled = true;
-
-        // Check if the input has reached a valid length (dd/mm/yyyy)
-        if (startDate.length === 10) {
-            // Ensure start date is not in the past
-            if (new Date(startDate) >= new Date()) {
-                endDateInput.disabled = false; // Enable the end date input
-            } else {
-                alert('Start date cannot be in the past.');
-            }
-        } else {
-            alert('Please enter a valid date (dd/mm/yyyy).');
-        }
-
-        // Disable leave type and reason if start date is greater than end date
-        if (endDate && new Date(startDate) > new Date(endDate)) {
-            leaveTypeInput.disabled = true;
-            reasonInput.disabled = true;
-            alert('Start date cannot be after end date.');
-        }
-    }
-
-    function validateEndDate() {
-        var startDateInput = document.getElementsByName('startdate')[0];
-        var endDateInput = document.getElementsByName('enddate')[0];
-        var leaveTypeInput = document.getElementsByName('leavetype')[0];
-        var reasonInput = document.getElementsByName('reason')[0];
-        var startDate = new Date(startDateInput.value);
-        var endDate = new Date(endDateInput.value);
-
-        // Check if the input has reached a valid length (dd/mm/yyyy)
-        if (endDateInput.value.length === 10) {
-            if (endDate > startDate) {
-                enableNextField(leaveTypeInput);
-                enableNextField(reasonInput);
-            } else {
-                alert('End date cannot be before start date.');
-                leaveTypeInput.disabled = true;
-                reasonInput.disabled = true;
-            }
-        } else {
-            alert('Please enter a valid end date (dd/mm/yyyy).');
-        }
-    }
-
-    {% endblock %}
-
-
-</script>

@@ -31,7 +31,7 @@ class Leave(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     startdate = models.DateField(verbose_name=_('Start Date'), help_text='leave start date is on ..', null=True,
                                  blank=False)
-    enddate = models.DateField(verbose_name=_('End Date'), help_text='leave until...', null=True, blank=False)
+    enddate = models.DateField(verbose_name=_('End Date'), help_text='comes back on', null=True, blank=False)
     leavetype = models.CharField(choices=LEAVE_TYPE, max_length=25, default=SICK, null=True, blank=False)
     reason = models.CharField(verbose_name=_('Reason for Leave'), max_length=255,
                               help_text='add additional information for leave', null=True, blank=True)
@@ -60,14 +60,13 @@ class Leave(models.Model):
         return '{0} - {1}'.format(employee, leave)
 
     def businessDays(self, startdate, enddate):
-        from datetime import datetime, timedelta
+        from datetime import timedelta
 
         # initializing dates ranges
         test_date1, test_date2 = startdate, enddate
 
         # generating dates
-        dates = (test_date1 + timedelta(idx)
-                 for idx in range((test_date2 - test_date1).days+1))
+        dates = (test_date1 + timedelta(idx+1) for idx in range((test_date2 - test_date1).days))
 
         # summing all weekdays removing weekends
         res = sum(1 for day in dates if day.weekday() < 5)
@@ -75,11 +74,12 @@ class Leave(models.Model):
         # holidayList
         holiday_list = [
             (12, 25),  # Christmas
-            (1, 1)  # New Year
+            (7, 4)  # New Year
         ]
 
-        for month, day in holiday_list:
-            if (startdate.month == month and startdate.day == day) or (enddate.month == month and enddate.day == day):
+        for holiday_month, holiday_day in holiday_list:
+            holiday_date = startdate.replace(month=holiday_month, day=holiday_day)
+            if startdate <= holiday_date <= enddate:
                 res -= 1
 
         return res
