@@ -124,3 +124,15 @@ def check_username(request):
     }
     return JsonResponse(data)
 
+
+def check_email(request):
+    if request.method == 'GET':
+        email = request.GET.get('email', None)
+        if email:
+            # Check if the email exists in the User model
+            email_exists = User.objects.filter(email=email).exists()
+            return JsonResponse({'exists': email_exists})
+        else:
+            return JsonResponse({'error': 'Email parameter is missing'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)

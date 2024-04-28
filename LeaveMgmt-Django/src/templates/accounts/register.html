@@ -130,11 +130,28 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!emailRegex.test(email)) {
             alert('Please enter a valid email address.');
         } else {
-            // Enable password fields after email validation
-            password1Input.disabled = false;
-            password2Input.disabled = false;
+            // Check if email already exists
+            fetch('/accounts/check_email/?email=' + encodeURIComponent(email))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        errorMessage.textContent = 'Email already taken.';
+                        // Disable submit button if email is already taken
+                        submitButton.disabled = true;
+
+                    } else {
+                        errorMessage.textContent = ''; // Clear error message
+                        // Enable password fields after email validation
+                        password1Input.disabled = false;
+                        password2Input.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking email:', error);
+                });
         }
     });
+
 
     // Validate password
     password1Input.addEventListener('blur', function() {
