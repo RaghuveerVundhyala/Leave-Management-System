@@ -68,31 +68,31 @@ def register_user_view(request):
 
 # Function to handle user login
 def login_view(request):
-    login_user = request.user
     if request.method == 'POST':
         form = UserLogin(data=request.POST)
         if form.is_valid():
-            username = request.POST.get('username')
-            password = request.POST.get('password')
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
 
             # Authenticating user
             user = authenticate(request, username=username, password=password)
             if user and user.is_active:
                 login(request, user)
-                if login_user.is_authenticated:
-                    return redirect('dashboard:dashboard')
+
+                return redirect('dashboard:dashboard')
             else:
                 # Display error message and redirect to login page
                 messages.error(request, 'Account is invalid', extra_tags='alert alert-error alert-dismissible show')
                 return redirect('accounts:login')
 
         else:
-            return HttpResponse('Data not valid')
+            messages.error(request, 'Invalid form data', extra_tags='alert alert-error alert-dismissible show')
+            return redirect('accounts:login')
 
-    dataset = dict()
-    form = UserLogin()
+    else:
+        form = UserLogin()
 
-    dataset['form'] = form
+    dataset = {'form': form}
     return render(request, 'accounts/login.html', dataset)
 
 
